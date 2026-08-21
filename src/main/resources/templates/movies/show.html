@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head(${movie.title})}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+
+    <section class="hero text-white py-5">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-3">
+                    <li class="breadcrumb-item"><a th:href="@{/movies}" class="link-light">Film</a></li>
+                    <li class="breadcrumb-item active text-white-50" aria-current="page"
+                        th:text="${movie.title}">Titolo</li>
+                </ol>
+            </nav>
+            <h1 class="h1 fw-bold mb-2" th:text="${movie.title}">Titolo del film</h1>
+            <p class="lead mb-0">
+                <span th:text="${movie.year}">2013</span>
+                <span th:if="${movie.genre}" th:text="' · ' + ${movie.genre}"> &middot; Drammatico</span>
+                <span th:if="${movie.country}" th:text="' · ' + ${movie.country}"> &middot; Italia</span>
+                <span th:if="${movie.duration}" th:text="' · ' + ${movie.duration} + ' min'"> &middot; 141 min</span>
+            </p>
+        </div>
+    </section>
+
+    <div class="container my-5">
+
+        <div class="row g-4">
+
+            <!-- ======================= REGISTA ======================= -->
+            <div class="col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h2 class="h5 card-title">Regista</h2>
+
+                        <div th:if="${movie.director}">
+                            <p class="fs-5 mb-1"
+                               th:text="${movie.director.name} + ' ' + ${movie.director.surname}">Nome Cognome</p>
+                            <p class="text-body-secondary small mb-1"
+                               th:if="${movie.director.nationality}"
+                               th:text="${movie.director.nationality}">Italiana</p>
+                            <p class="text-body-secondary small mb-0"
+                               th:if="${movie.director.birthDate}">
+                                Nato il <span th:text="${movie.director.birthDate}">1970-05-31</span>
+                            </p>
+                        </div>
+
+                        <p th:unless="${movie.director}" class="text-body-secondary mb-0">
+                            Regista non disponibile.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====================== FESTIVAL ======================= -->
+            <div class="col-lg-8">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h2 class="h5 card-title">Festival</h2>
+
+                        <p th:if="${#lists.isEmpty(movie.festivals)}" class="text-body-secondary mb-0">
+                            Questo film non partecipa ad alcun festival.
+                        </p>
+
+                        <ul th:unless="${#lists.isEmpty(movie.festivals)}" class="list-unstyled mb-0">
+                            <li class="mb-2" th:each="festival : ${movie.festivals}">
+                                <a th:href="@{/festivals/{id}(id=${festival.id})}"
+                                   th:text="${festival.name}">Nome festival</a>
+                                <span class="text-body-secondary small">
+                                    &mdash;
+                                    <span th:text="${festival.city}">Roma</span>,
+                                    <span th:text="${festival.year}">2026</span>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ====================== PROIEZIONI ======================== -->
+        <h2 class="h4 mt-5 mb-3">Proiezioni</h2>
+
+        <div th:if="${#lists.isEmpty(movie.screenings)}" class="alert alert-secondary">
+            Non ci sono proiezioni programmate per questo film.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(movie.screenings)}" class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th scope="col">Data</th>
+                    <th scope="col">Ora</th>
+                    <th scope="col">Festival</th>
+                    <th scope="col">Sala</th>
+                    <th scope="col">Stato</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="screening : ${movie.screenings}">
+                    <td th:text="${screening.date}">2026-09-10</td>
+                    <td th:text="${screening.time}">18:00</td>
+                    <td>
+                        <a th:href="@{/festivals/{id}(id=${screening.festival.id})}"
+                           th:text="${screening.festival.name}">Festival</a>
+                    </td>
+                    <td>
+                        <span th:text="${screening.theater.name}">Sala Fellini</span>
+                        <span class="text-body-secondary small"
+                              th:text="'(' + ${screening.theater.address} + ')'">(indirizzo)</span>
+                    </td>
+                    <td th:replace="~{fragments/layout :: statusBadge(${screening.status})}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ====================== RECENSIONI ======================== -->
+        <h2 class="h4 mt-5 mb-3">Recensioni</h2>
+
+        <div th:if="${#lists.isEmpty(movie.reviews)}" class="alert alert-secondary">
+            Nessuna recensione per questo film.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(movie.reviews)}" class="vstack gap-3">
+            <article class="card" th:each="review : ${movie.reviews}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-baseline mb-2">
+                        <span class="fw-semibold" th:text="${review.user.username}">utente</span>
+                        <span class="text-body-secondary small" th:text="${review.reviewDate}">2025-11-02</span>
+                    </div>
+                    <p class="mb-2">
+                        <span class="text-warning" th:text="${#strings.repeat('★', review.rating)}">&#9733;&#9733;&#9733;</span>
+                        <span class="text-body-secondary small" th:text="${review.rating} + '/5'">5/5</span>
+                    </p>
+                    <p class="card-text mb-0" th:text="${review.text}">Testo della recensione.</p>
+                </div>
+            </article>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

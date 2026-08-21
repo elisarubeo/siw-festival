@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Pagina non trovata')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+    <div class="container my-5 text-center">
+        <p class="display-1 fw-bold text-body-tertiary mb-0">404</p>
+        <h1 class="h3 mb-3">Pagina non trovata</h1>
+        <p class="text-body-secondary" th:text="${message}">
+            La risorsa richiesta non esiste.
+        </p>
+        <a th:href="@{/}" class="btn btn-dark mt-3">Torna alla home</a>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+/* Stili propri dell'applicazione: si sovrappongono a Bootstrap,
+   che viene caricato prima di questo file. */
+
+.hero {
+    background-color: #1a1a2e;
+}
+
+/* Le card dei festival si sollevano leggermente al passaggio del mouse */
+.card {
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
+}
+
+.footer {
+    font-size: .9rem;
+}

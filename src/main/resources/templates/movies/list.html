@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Film')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+    <div class="container my-5">
+
+        <h1 class="h2 mb-4">Film</h1>
+
+        <div th:if="${#lists.isEmpty(movies)}" class="alert alert-secondary">
+            Non ci sono film registrati nel sistema.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(movies)}" class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th scope="col">Titolo</th>
+                    <th scope="col">Anno</th>
+                    <th scope="col">Genere</th>
+                    <th scope="col">Regista</th>
+                    <th scope="col">Paese</th>
+                    <th scope="col">Durata</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="movie : ${movies}">
+                    <td>
+                        <a th:href="@{/movies/{id}(id=${movie.id})}"
+                           th:text="${movie.title}">Titolo del film</a>
+                    </td>
+                    <td th:text="${movie.year}">2013</td>
+                    <td th:text="${movie.genre}">Drammatico</td>
+                    <td th:if="${movie.director}"
+                        th:text="${movie.director.name} + ' ' + ${movie.director.surname}">Regista</td>
+                    <td th:unless="${movie.director}" class="text-body-secondary">&mdash;</td>
+                    <td th:text="${movie.country}">Italia</td>
+                    <td>
+                        <span th:if="${movie.duration}" th:text="${movie.duration} + ' min'">141 min</span>
+                        <span th:unless="${movie.duration}" class="text-body-secondary">&mdash;</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

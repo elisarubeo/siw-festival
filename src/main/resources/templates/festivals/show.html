@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head(${festival.name})}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+
+    <section class="hero text-white py-5">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-3">
+                    <li class="breadcrumb-item"><a th:href="@{/festivals}" class="link-light">Festival</a></li>
+                    <li class="breadcrumb-item active text-white-50" aria-current="page"
+                        th:text="${festival.name}">Nome</li>
+                </ol>
+            </nav>
+            <h1 class="h1 fw-bold mb-2" th:text="${festival.name}">Nome del festival</h1>
+            <p class="lead mb-0">
+                <span th:text="${festival.city}">Roma</span>,
+                <span th:text="${festival.year}">2026</span>
+                &middot;
+                dal <span th:text="${festival.startDate}">2026-09-10</span>
+                al <span th:text="${festival.endDate}">2026-09-20</span>
+            </p>
+        </div>
+    </section>
+
+    <div class="container my-5">
+
+        <p class="fs-5" th:if="${festival.description}" th:text="${festival.description}">
+            Descrizione del festival.
+        </p>
+
+        <!-- =================== FILM PARTECIPANTI =================== -->
+        <h2 class="h4 mt-5 mb-3">Film in concorso</h2>
+
+        <div th:if="${#lists.isEmpty(festival.movies)}" class="alert alert-secondary">
+            Nessun film associato a questo festival.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(festival.movies)}"
+             class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+            <div class="col" th:each="movie : ${festival.movies}">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="h6 card-title mb-1">
+                            <a th:href="@{/movies/{id}(id=${movie.id})}"
+                               th:text="${movie.title}">Titolo</a>
+                        </h3>
+                        <p class="card-text small text-body-secondary mb-0">
+                            <span th:text="${movie.year}">2013</span>
+                            <span th:if="${movie.genre}" th:text="'· ' + ${movie.genre}">&middot; Drammatico</span>
+                        </p>
+                        <p class="card-text small text-body-secondary mb-0" th:if="${movie.director}">
+                            di <span th:text="${movie.director.name} + ' ' + ${movie.director.surname}">Regista</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================== PROGRAMMA ======================== -->
+        <h2 class="h4 mt-5 mb-3">Programma delle proiezioni</h2>
+
+        <div th:if="${#lists.isEmpty(festival.screenings)}" class="alert alert-secondary">
+            Il programma di questo festival non &egrave; ancora disponibile.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(festival.screenings)}" class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th scope="col">Data</th>
+                    <th scope="col">Ora</th>
+                    <th scope="col">Film</th>
+                    <th scope="col">Sala</th>
+                    <th scope="col">Stato</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="screening : ${festival.screenings}">
+                    <td th:text="${screening.date}">2026-09-10</td>
+                    <td th:text="${screening.time}">18:00</td>
+                    <td>
+                        <a th:href="@{/movies/{id}(id=${screening.movie.id})}"
+                           th:text="${screening.movie.title}">Titolo</a>
+                    </td>
+                    <td th:text="${screening.theater.name}">Sala Fellini</td>
+                    <td th:replace="~{fragments/layout :: statusBadge(${screening.status})}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

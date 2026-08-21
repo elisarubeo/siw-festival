@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Home')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+
+    <section class="hero text-white py-5">
+        <div class="container py-4">
+            <h1 class="display-5 fw-bold">Festival cinematografici</h1>
+            <p class="lead mb-0">
+                Sfoglia i festival, scopri i film in concorso e i loro registi,
+                consulta il programma delle proiezioni e leggi le recensioni.
+            </p>
+        </div>
+    </section>
+
+    <div class="container my-5">
+
+        <div class="d-flex align-items-baseline justify-content-between mb-4">
+            <h2 class="h3 mb-0">Festival</h2>
+            <a th:href="@{/festivals}" class="small">Vedi tutti &rarr;</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(festivals)}" class="alert alert-secondary">
+            Non ci sono festival disponibili al momento.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(festivals)}" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="col" th:each="festival : ${festivals}">
+                <article class="card h-100">
+                    <div class="card-body d-flex flex-column">
+
+                        <h3 class="card-title h5" th:text="${festival.name}">Nome del festival</h3>
+
+                        <p class="card-subtitle text-body-secondary mb-3">
+                            <span th:text="${festival.city}">Roma</span>
+                            &middot;
+                            <span th:text="${festival.year}">2026</span>
+                        </p>
+
+                        <p class="card-text small text-body-secondary mb-3">
+                            <span th:text="${festival.startDate}">2026-09-01</span>
+                            &mdash;
+                            <span th:text="${festival.endDate}">2026-09-10</span>
+                        </p>
+
+                        <p class="card-text" th:if="${festival.description}"
+                           th:text="${#strings.abbreviate(festival.description, 140)}">
+                            Breve descrizione del festival.
+                        </p>
+
+                        <a class="btn btn-outline-dark mt-auto align-self-start"
+                           th:href="@{/festivals/{id}(id=${festival.id})}">
+                            Dettagli
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

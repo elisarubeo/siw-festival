@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Festival')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+    <div class="container my-5">
+
+        <h1 class="h2 mb-4">Festival</h1>
+
+        <div th:if="${#lists.isEmpty(festivals)}" class="alert alert-secondary">
+            Non ci sono festival registrati nel sistema.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(festivals)}" class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Citt&agrave;</th>
+                    <th scope="col">Anno</th>
+                    <th scope="col">Periodo</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="festival : ${festivals}">
+                    <td>
+                        <a th:href="@{/festivals/{id}(id=${festival.id})}"
+                           th:text="${festival.name}">Nome del festival</a>
+                    </td>
+                    <td th:text="${festival.city}">Roma</td>
+                    <td th:text="${festival.year}">2026</td>
+                    <td class="text-body-secondary">
+                        <span th:text="${festival.startDate}">2026-09-10</span>
+                        &mdash;
+                        <span th:text="${festival.endDate}">2026-09-20</span>
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-dark"
+                           th:href="@{/festivals/{id}(id=${festival.id})}">Dettagli</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>
