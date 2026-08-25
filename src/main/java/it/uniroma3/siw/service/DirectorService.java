@@ -1,3 +1,4 @@
+package it.uniroma3.siw.service;
 import it.uniroma3.siw.model.*;
 import it.uniroma3.siw.repository.*;
 import org.springframework.stereotype.Service;

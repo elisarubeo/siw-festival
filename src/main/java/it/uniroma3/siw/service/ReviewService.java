@@ -1,3 +1,4 @@
+package it.uniroma3.siw.service;
 import it.uniroma3.siw.model.*;
 import it.uniroma3.siw.repository.*;
 import org.springframework.stereotype.Service;
@@ -7,10 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ReviewService {
-    private final ReviewRepository reviewRepository;
+    private ReviewRepository reviewRepository;
 
     public ReviewService(ReviewRepository reviewRepository) {
-        this.reviewRepository = reviewrRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     @Transactional(readOnly = true)

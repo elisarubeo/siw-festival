@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import it.uniroma3.siw.exception.ResourceNotFoundException;
 import it.uniroma3.siw.model.Festival;
-import it.uniroma3.siw.model.Movie;
 import it.uniroma3.siw.service.FestivalService;
 import jakarta.validation.Valid;
 
@@ -34,28 +33,27 @@ public class FestivalController {
         return "festivals/show";
     }
 
+    @GetMapping("/festivals")
+    public String list(Model model) {
+        model.addAttribute("festivals", this.festivalService.findAll());
+        return "festivals/list";
+    }
+
     @GetMapping("/festivals/new")
     public String createForm(Model model) {
-        model.addAttribute("festival", new Movie());
+        model.addAttribute("festival", new Festival());
         return "festivals/form";
     }
 
-    @PostMapping("/festival")
-    public String newFestival(@ModelAttribute("festival") Festival festival) {
-        this.festivalService.save(festival);
-        return "redirect:/festivals";
-    }
-
     @PostMapping("/festivals")
-    public String save(@Valid @ModelAttribute("festival") Festival festival, 
-                                BindingResult bindingResult, Model model) {
-        
-        if (bindingResult.hasErrors()) 
-            return "festivals/form.html";
-        else {
+    public String save(@Valid @ModelAttribute("festival") Festival festival,
+                       BindingResult bindingResult, Model model) {
+
+        if (bindingResult.hasErrors())
+            return "festivals/form";
+
         this.festivalService.save(festival);
         return "redirect:/festivals";
-        }
     }
     
 }

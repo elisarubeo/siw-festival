@@ -11,7 +11,7 @@
     <div class="container my-5 text-center">
         <p class="display-1 fw-bold text-body-tertiary mb-0">404</p>
         <h1 class="h3 mb-3">Pagina non trovata</h1>
-        <p class="text-body-secondary" th:text="${message}">
+        <p class="text-body-secondary" th:text="${errorMessage}">
             La risorsa richiesta non esiste.
         </p>
         <a th:href="@{/}" class="btn btn-dark mt-3">Torna alla home</a>

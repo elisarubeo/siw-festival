@@ -1,14 +1,17 @@
 package it.uniroma3.siw.model;
 
-import org.hibernate.annotations.CascadeType;
-import org.springframework.data.annotation.Id;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 
+@Entity
 public class Credentials {
+
     public static final String DEFAULT_ROLE = "DEFAULT";
     public static final String ADMIN_ROLE = "ADMIN";
 
@@ -19,12 +22,14 @@ public class Credentials {
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false, length = 16)
     private String role;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
     private User user;
 
     public static String getDefaultRole() {
@@ -99,6 +104,4 @@ public class Credentials {
             return false;
         return true;
     }
-
-    
 }

@@ -1,3 +1,4 @@
+package it.uniroma3.siw.service;
 import it.uniroma3.siw.model.*;
 import it.uniroma3.siw.repository.*;
 import org.springframework.stereotype.Service;
@@ -9,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TheaterService {
     private final TheaterRepository theaterRepository;
 
-    publice TheaterService(TheaterRepository theaterRepository) {
+    public TheaterService(TheaterRepository theaterRepository) {
         this.theaterRepository = theaterRepository;
     }
 

@@ -46,26 +46,20 @@ public class MovieController {
         return "movies/form";
     }
 
-    @PostMapping("/movie")
-    public String newMovie(@ModelAttribute("movie") Movie movie) {
-        this.movieService.save(movie);
-        return "redirect:/movies";
-    }
+    @PostMapping("/movies")
+    public String save(@Valid @ModelAttribute("movie") Movie movie,
+                       BindingResult bindingResult, Model model) {
 
-    @PostMapping("movies")
-    public String save(@Valid @ModelAttribute("movie") Movie movie, 
-                                    BindingResult bindingResult, Model model) {
-    if (bindingResult.hasErrors()) {
-        return "movies/form";
-    } 
-    try {
-        movieService.save(movie);
-        return "redirect:/movies";
-    } 
-    catch (DuplicateResourceException e) {
-        bindingResult.reject("movie.duplicate");
-        return "movies/form";
-    }
+        if (bindingResult.hasErrors())
+            return "movies/form";
+
+        try {
+            this.movieService.save(movie);
+            return "redirect:/movies";
+        } catch (DuplicateResourceException e) {
+            bindingResult.reject("movie.duplicate");
+            return "movies/form";
+        }
     }
 
 }

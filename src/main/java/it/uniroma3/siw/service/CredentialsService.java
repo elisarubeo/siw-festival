@@ -3,9 +3,12 @@ package it.uniroma3.siw.service;
 
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import it.uniroma3.siw.model.Credentials;
 import it.uniroma3.siw.repository.CredentialsRepository;
 
+@Service
 public class CredentialsService {
     CredentialsRepository credentialsRepository;
 

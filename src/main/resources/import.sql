@@ -57,11 +57,18 @@ insert into screening (id, screening_date, start_time, status, festival_id, movi
 insert into screening (id, screening_date, start_time, status, festival_id, movie_id, theater_id) values (12, '2025-07-08', '21:30', 'CANCELLED', 3, 1, 4);
 
 -- ============================== UTENTI ===============================
--- Le password sono in chiaro SOLO perche' Spring Security non c'e' ancora:
--- vanno sostituite con hash BCrypt quando si aggiunge l'autenticazione.
-insert into users (id, username, password, role) values (1, 'admin', 'admin', 'ADMIN');
-insert into users (id, username, password, role) values (2, 'elisa', 'password', 'USER');
-insert into users (id, username, password, role) values (3, 'marco', 'password', 'USER');
+-- User contiene solo il profilo; username e password stanno in Credentials.
+insert into users (id, role) values (1, 'ADMIN');
+insert into users (id, role) values (2, 'USER');
+insert into users (id, role) values (3, 'USER');
+
+-- ============================ CREDENZIALI ============================
+-- Password cifrate con BCrypt: admin/admin, elisa/password, marco/password.
+-- Il PasswordEncoder cifra solo quando si registra dall'applicazione,
+-- quindi gli hash inseriti via SQL vanno generati a parte.
+insert into credentials (id, username, password, role, user_id) values (1, 'admin', '$2a$10$25KyureLZaPhBw2ZSVRrDeNWrwmUONheHNxgVspmL/n6rpr1PAnLi', 'ADMIN', 1);
+insert into credentials (id, username, password, role, user_id) values (2, 'elisa', '$2a$10$N5z1e9AdGpc2DWL7eiJ2GuZvwkiVh5Y9vPI2KqTOV7235fhfqFSbu', 'DEFAULT', 2);
+insert into credentials (id, username, password, role, user_id) values (3, 'marco', '$2a$10$vgRJAtBbDHN/g2ITv6tFYeuwrpTUXO0i4CDfw44YCV6Nmu5EUKFWe', 'DEFAULT', 3);
 
 -- ============================ RECENSIONI =============================
 insert into review (id, text, rating, review_date, movie_id, user_id) values (1, 'Un affresco malinconico e sontuoso su Roma. La fotografia da sola vale la visione.', 5, '2025-11-02', 1, 2);
@@ -79,4 +86,5 @@ alter sequence festival_seq restart with 1000;
 alter sequence theater_seq restart with 1000;
 alter sequence screening_seq restart with 1000;
 alter sequence users_seq restart with 1000;
+alter sequence credentials_seq restart with 1000;
 alter sequence review_seq restart with 1000;

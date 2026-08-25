@@ -10,7 +10,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import it.uniroma3.siw.model.Credentials;
 
 @Configuration
 @EnableWebSecurity
@@ -25,10 +28,10 @@ public class SecurityConfiguration {
     @Bean
     public UserDetailsService userDetailsService() {
         JdbcUserDetailsManager manager = new JdbcUserDetailsManager(dataSource);
-        manager.setUsersByUsernameQuery("SELECT username, password, 1 as enabled 
-                                        FROM credentials WHERE username=?");
-        manager.setAuthoritiesByUsernameQuery("SELECT username, role 
-                                            FROM credentials WHERE username=?");
+        manager.setUsersByUsernameQuery(
+                "SELECT username, password, true AS enabled FROM credentials WHERE username = ?");
+        manager.setAuthoritiesByUsernameQuery(
+                "SELECT username, role FROM credentials WHERE username = ?");
         return manager;
     }
 
@@ -38,22 +41,56 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    protected SecurityFilterChain configure(final HttpSecurity httpSecurity) throws Exception {
-        
+    public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
+
+        /* ATTENZIONE ALL'ORDINE: vince la prima regola che corrisponde alla
+           richiesta, quindi le regole piu' specifiche vanno prima di quelle
+           generiche. Le rotte di amministrazione stanno sopra le pubbliche,
+           altrimenti "/festivals/**" lascerebbe passare anche "/festivals/new". */
         httpSecurity.authorizeHttpRequests(authorize -> {
-            authorize.requestMatchers(HttpMethod.GET, "/", "/index", "/register", "/css/**", "/images/**",   
-                                                        "/favicon.ico").permitAll();
-            authorize.requestMatchers(HttpMethod.POST, "/register", "/login").permitAll();
-            authorize.requestMatchers(HttpMethod.GET, "/admin/**").hasAnyAuthority(ADMIN_ROLE);
-            authorize.requestMatchers(HttpMethod.POST, "/admin/**").hasAnyAuthority(ADMIN_ROLE);   
+
+            // risorse statiche: sempre accessibili
+            authorize.requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll();
+
+            /* /error deve restare accessibile: quando una richiesta produce un
+               404 o un 500, Spring la inoltra internamente qui. Se fosse
+               protetta, ogni errore diventerebbe un redirect al login. */
+            authorize.requestMatchers("/error").permitAll();
+
+            // funzionalita' riservate all'amministratore
+            authorize.requestMatchers("/admin/**").hasAuthority(Credentials.ADMIN_ROLE);
+            authorize.requestMatchers(HttpMethod.GET, "/festivals/new", "/movies/new")
+                    .hasAuthority(Credentials.ADMIN_ROLE);
+            authorize.requestMatchers(HttpMethod.POST, "/festivals", "/movies")
+                    .hasAuthority(Credentials.ADMIN_ROLE);
+
+            // funzionalita' pubbliche
+            authorize.requestMatchers(HttpMethod.GET,
+                    "/", "/index", "/register", "/login",
+                    "/festivals", "/festivals/**",
+                    "/movies", "/movies/**",
+                    "/screenings", "/api/**").permitAll();
+            authorize.requestMatchers(HttpMethod.POST, "/register").permitAll();
+
+            // tutto il resto richiede un utente autenticato
             authorize.anyRequest().authenticated();
         });
 
-        httpSecurity.formLogin(...);
-        httpSecurity.logout(...);
-        
+        httpSecurity.formLogin(form -> {
+            form.loginPage("/login").permitAll();
+            form.defaultSuccessUrl("/", true);
+            form.failureUrl("/login?error=true");
+        });
+
+        httpSecurity.logout(logout -> {
+            logout.logoutUrl("/logout");
+            logout.logoutSuccessUrl("/");
+            logout.invalidateHttpSession(true);
+            logout.deleteCookies("JSESSIONID");
+            logout.clearAuthentication(true);
+            logout.permitAll();
+        });
+
         return httpSecurity.build();
     }
 }
-
-  
