@@ -1,0 +1,24 @@
+import it.uniroma3.siw.model.*;
+import it.uniroma3.siw.repository.*;
+import org.springframework.stereotype.Service;
+import java.util.List;
+
+@Service
+public class ScreeningService {
+    private final ScreeningRepository screeningRepository;
+
+    public ScreeningService(ScreeningRepository screeningRepository) {
+        this.screeningRepository = screeningRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Screening> findById(Long id) {
+        return screeningRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Screening> findAll() {
+        return screeningRepository.findAll();
+    }
+
+}

@@ -1,15 +1,21 @@
 package it.uniroma3.siw.controller;
 
-import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import it.uniroma3.siw.exception.ResourceNotFoundException;
 import it.uniroma3.siw.model.Festival;
+import it.uniroma3.siw.model.Movie;
 import it.uniroma3.siw.service.FestivalService;
+import jakarta.validation.Valid;
+
+
 
 @Controller
 public class FestivalController {
@@ -28,10 +34,28 @@ public class FestivalController {
         return "festivals/show";
     }
 
-    @GetMapping("/festivals")
-    public String list(Model model) {
-        List<Festival> allFestivals = this.festivalService.findAll();
-        model.addAttribute("festivals", allFestivals);
-        return "festivals/list";
+    @GetMapping("/festivals/new")
+    public String createForm(Model model) {
+        model.addAttribute("festival", new Movie());
+        return "festivals/form";
     }
+
+    @PostMapping("/festival")
+    public String newFestival(@ModelAttribute("festival") Festival festival) {
+        this.festivalService.save(festival);
+        return "redirect:/festivals";
+    }
+
+    @PostMapping("/festivals")
+    public String save(@Valid @ModelAttribute("festival") Festival festival, 
+                                BindingResult bindingResult, Model model) {
+        
+        if (bindingResult.hasErrors()) 
+            return "festivals/form.html";
+        else {
+        this.festivalService.save(festival);
+        return "redirect:/festivals";
+        }
+    }
+    
 }

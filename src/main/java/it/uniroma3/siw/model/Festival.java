@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 
 @Entity
 public class Festival {
@@ -42,6 +43,7 @@ public class Festival {
     private List<Movie> movies = new ArrayList<>();
 
     /* le proiezioni non esistono senza il festival: cascade + orphanRemoval */
+    @OrderBy("date ASC, time ASC")
     @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Screening> screenings = new ArrayList<>();
 

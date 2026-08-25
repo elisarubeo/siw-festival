@@ -4,12 +4,17 @@ import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
+import it.uniroma3.siw.exception.DuplicateResourceException;
 import it.uniroma3.siw.exception.ResourceNotFoundException;
 import it.uniroma3.siw.model.Movie;
 import it.uniroma3.siw.service.MovieService;
+import jakarta.validation.Valid;
 
 @Controller
 public class MovieController {
@@ -34,4 +39,33 @@ public class MovieController {
         model.addAttribute("movies", allMovies);
         return "movies/list";
     }
+
+    @GetMapping("/movies/new")
+    public String createForm(Model model) {
+        model.addAttribute("movie", new Movie());
+        return "movies/form";
+    }
+
+    @PostMapping("/movie")
+    public String newMovie(@ModelAttribute("movie") Movie movie) {
+        this.movieService.save(movie);
+        return "redirect:/movies";
+    }
+
+    @PostMapping("movies")
+    public String save(@Valid @ModelAttribute("movie") Movie movie, 
+                                    BindingResult bindingResult, Model model) {
+    if (bindingResult.hasErrors()) {
+        return "movies/form";
+    } 
+    try {
+        movieService.save(movie);
+        return "redirect:/movies";
+    } 
+    catch (DuplicateResourceException e) {
+        bindingResult.reject("movie.duplicate");
+        return "movies/form";
+    }
+    }
+
 }

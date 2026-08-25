@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import it.uniroma3.siw.model.Festival;
 import it.uniroma3.siw.repository.FestivalRepository;
@@ -17,11 +18,18 @@ public class FestivalService {
         this.festivalRepository = festivalRepository;
     }
 
+    @Transactional(readOnly = true)
     public Optional<Festival> findById(Long id) {
         return festivalRepository.findById(id);
     }
 
+    @Transactional(readOnly = true)
     public List<Festival> findAll() {
         return festivalRepository.findAll();
+    }
+
+    @Transactional
+    public Festival save(Festival festival) {
+        return festivalRepository.save(festival);
     }
 }
