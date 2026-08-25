@@ -48,7 +48,8 @@
                 <div class="card h-100">
                     <div class="card-body">
                         <h3 class="h6 card-title mb-1">
-                            <a th:href="@{/movies/{id}(id=${movie.id})}"
+                            <a class="stretched-link"
+                               th:href="@{/movies/{id}(id=${movie.id})}"
                                th:text="${movie.title}">Titolo</a>
                         </h3>
                         <p class="card-text small text-body-secondary mb-0">

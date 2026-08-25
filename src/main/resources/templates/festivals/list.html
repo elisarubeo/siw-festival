@@ -16,37 +16,40 @@
             Non ci sono festival registrati nel sistema.
         </div>
 
-        <div th:unless="${#lists.isEmpty(festivals)}" class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
-                <tr>
-                    <th scope="col">Nome</th>
-                    <th scope="col">Citt&agrave;</th>
-                    <th scope="col">Anno</th>
-                    <th scope="col">Periodo</th>
-                    <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="festival : ${festivals}">
-                    <td>
-                        <a th:href="@{/festivals/{id}(id=${festival.id})}"
-                           th:text="${festival.name}">Nome del festival</a>
-                    </td>
-                    <td th:text="${festival.city}">Roma</td>
-                    <td th:text="${festival.year}">2026</td>
-                    <td class="text-body-secondary">
-                        <span th:text="${festival.startDate}">2026-09-10</span>
-                        &mdash;
-                        <span th:text="${festival.endDate}">2026-09-20</span>
-                    </td>
-                    <td class="text-end">
-                        <a class="btn btn-sm btn-outline-dark"
-                           th:href="@{/festivals/{id}(id=${festival.id})}">Dettagli</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+        <div th:unless="${#lists.isEmpty(festivals)}"
+             class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+            <div class="col" th:each="festival : ${festivals}">
+                <article class="card h-100">
+                    <div class="card-body">
+
+                        <h2 class="card-title h5 mb-1">
+                            <a class="stretched-link"
+                               th:href="@{/festivals/{id}(id=${festival.id})}"
+                               th:text="${festival.name}">Nome del festival</a>
+                        </h2>
+
+                        <p class="card-subtitle text-body-secondary mb-3">
+                            <span th:text="${festival.city}">Roma</span>
+                            ·
+                            <span th:text="${festival.year}">2026</span>
+                        </p>
+
+                        <p class="card-text small text-body-secondary mb-3">
+                            <span th:text="${festival.startDate}">2026-09-10</span>
+                            &mdash;
+                            <span th:text="${festival.endDate}">2026-09-20</span>
+                        </p>
+
+                        <p class="card-text" th:if="${festival.description}"
+                           th:text="${#strings.abbreviate(festival.description, 140)}">
+                            Breve descrizione del festival.
+                        </p>
+
+                    </div>
+                </article>
+            </div>
+
         </div>
 
     </div>

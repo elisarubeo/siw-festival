@@ -33,9 +33,14 @@
         <div th:unless="${#lists.isEmpty(festivals)}" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             <div class="col" th:each="festival : ${festivals}">
                 <article class="card h-100">
-                    <div class="card-body d-flex flex-column">
+                    <div class="card-body">
 
-                        <h3 class="card-title h5" th:text="${festival.name}">Nome del festival</h3>
+                        <h3 class="card-title h5 mb-1">
+                            <!-- stretched-link rende cliccabile tutta la card -->
+                            <a class="stretched-link"
+                               th:href="@{/festivals/{id}(id=${festival.id})}"
+                               th:text="${festival.name}">Nome del festival</a>
+                        </h3>
 
                         <p class="card-subtitle text-body-secondary mb-3">
                             <span th:text="${festival.city}">Roma</span>
@@ -54,10 +59,6 @@
                             Breve descrizione del festival.
                         </p>
 
-                        <a class="btn btn-outline-dark mt-auto align-self-start"
-                           th:href="@{/festivals/{id}(id=${festival.id})}">
-                            Dettagli
-                        </a>
                     </div>
                 </article>
             </div>

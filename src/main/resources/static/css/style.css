@@ -5,7 +5,38 @@
     background-color: #1a1a2e;
 }
 
-/* Le card dei festival si sollevano leggermente al passaggio del mouse */
+/* -------------------------------------------------------------------
+   Link
+   Bootstrap colora i link di blu attraverso queste due variabili:
+   riportandole al colore del testo, nessun link e' piu' blu.
+   ------------------------------------------------------------------- */
+:root {
+    --bs-link-color-rgb: var(--bs-body-color-rgb);
+    --bs-link-hover-color-rgb: var(--bs-body-color-rgb);
+}
+
+/* Niente sottolineatura, se non al passaggio del mouse.
+   I bottoni sono esclusi per non rovinarne lo stile. */
+a:not(.btn) {
+    text-decoration: none;
+}
+
+a:not(.btn):hover,
+a:not(.btn):focus {
+    text-decoration: underline;
+}
+
+/* Nel contenuto il link eredita il colore del testo intorno:
+   scuro sul bianco, chiaro sulla fascia scura in cima alle pagine. */
+main a:not(.btn) {
+    color: inherit;
+}
+
+/* -------------------------------------------------------------------
+   Card
+   Quelle che contengono un .stretched-link sono cliccabili per intero:
+   l'ancora viene estesa da Bootstrap su tutta l'area della card.
+   ------------------------------------------------------------------- */
 .card {
     transition: transform .15s ease, box-shadow .15s ease;
 }
@@ -13,6 +44,11 @@
 .card:hover {
     transform: translateY(-2px);
     box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
+}
+
+/* Passando sulla card si sottolinea il titolo, per far capire che e' un link */
+.card:hover .card-title a.stretched-link {
+    text-decoration: underline;
 }
 
 .footer {
