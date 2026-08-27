@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Registi')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+    <div class="container my-5">
+
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h1 class="h2 mb-0">Registi</h1>
+            <a th:href="@{/directors/new}" class="btn btn-dark">Nuovo regista</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(directors)}" class="alert alert-secondary">
+            Non ci sono registi registrati nel sistema.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(directors)}"
+             class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+            <div class="col" th:each="director : ${directors}">
+                <article class="card h-100">
+                    <div class="card-body">
+
+                        <h2 class="card-title h5 mb-1">
+                            <a class="stretched-link"
+                               th:href="@{/directors/{id}(id=${director.id})}"
+                               th:text="${director.name} + ' ' + ${director.surname}">Nome Cognome</a>
+                        </h2>
+
+                        <p class="card-subtitle text-body-secondary mb-2"
+                           th:if="${director.nationality}"
+                           th:text="${director.nationality}">Italiana</p>
+
+                        <p class="card-text small text-body-secondary mb-0"
+                           th:if="${director.birthDate}">
+                            Nato il <span th:text="${director.birthDate}">1970-05-31</span>
+                        </p>
+
+                    </div>
+                </article>
+            </div>
+
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

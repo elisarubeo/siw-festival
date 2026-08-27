@@ -57,10 +57,10 @@ insert into screening (id, screening_date, start_time, status, festival_id, movi
 insert into screening (id, screening_date, start_time, status, festival_id, movie_id, theater_id) values (12, '2025-07-08', '21:30', 'CANCELLED', 3, 1, 4);
 
 -- ============================== UTENTI ===============================
--- User contiene solo il profilo; username e password stanno in Credentials.
-insert into users (id, role) values (1, 'ADMIN');
-insert into users (id, role) values (2, 'USER');
-insert into users (id, role) values (3, 'USER');
+-- User contiene solo il profilo; username, password e ruolo stanno in Credentials.
+insert into users (id, name, surname) values (1, 'Anna', 'Bianchi');
+insert into users (id, name, surname) values (2, 'Elisa', 'Rubeo');
+insert into users (id, name, surname) values (3, 'Marco', 'Verdi');
 
 -- ============================ CREDENZIALI ============================
 -- Password cifrate con BCrypt: admin/admin, elisa/password, marco/password.

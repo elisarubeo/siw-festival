@@ -10,6 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
 
 @Entity
 public class Director {
@@ -17,14 +19,17 @@ public class Director {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "Il nome è obbligatorio")
     @Column(nullable = false)
     private String name;
 
+    @NotBlank(message = "Il cognome è obbligatorio")
     @Column(nullable = false)
     private String surname;
 
     private String nationality;
 
+    @Past(message = "La data di nascita deve essere nel passato")
     private LocalDate birthDate;
 
     @OneToMany(mappedBy = "director")

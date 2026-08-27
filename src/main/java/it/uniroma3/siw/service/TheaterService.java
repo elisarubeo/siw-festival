@@ -23,4 +23,9 @@ public class TheaterService {
     public List<Theater> findAll() {
         return theaterRepository.findAll();
     }
+
+    @Transactional
+    public Theater save(Theater theater) {
+        return theaterRepository.save(theater);
+    }
 }

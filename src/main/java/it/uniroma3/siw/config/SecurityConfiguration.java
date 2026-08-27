@@ -59,6 +59,13 @@ public class SecurityConfiguration {
 
             // funzionalita' riservate all'amministratore
             authorize.requestMatchers("/admin/**").hasAuthority(Credentials.ADMIN_ROLE);
+
+            /* Registi e sale sono interamente riservati all'amministratore:
+               non essendoci pagine pubbliche su questi percorsi, basta una
+               regola sola per ciascuno, valida per qualunque metodo HTTP. */
+            authorize.requestMatchers("/directors/**").hasAuthority(Credentials.ADMIN_ROLE);
+            authorize.requestMatchers("/theaters/**").hasAuthority(Credentials.ADMIN_ROLE);
+
             authorize.requestMatchers(HttpMethod.GET, "/festivals/new", "/movies/new")
                     .hasAuthority(Credentials.ADMIN_ROLE);
             authorize.requestMatchers(HttpMethod.POST, "/festivals", "/movies")
@@ -93,4 +100,5 @@ public class SecurityConfiguration {
 
         return httpSecurity.build();
     }
+    
 }

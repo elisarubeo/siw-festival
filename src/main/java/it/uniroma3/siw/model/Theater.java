@@ -9,6 +9,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Theater {
@@ -16,12 +19,16 @@ public class Theater {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "Il nome è obbligatorio")
     @Column(nullable = false)
     private String name;
 
+    @NotBlank(message = "L'indirizzo è obbligatorio")
     @Column(nullable = false)
     private String address;
 
+    @NotNull(message = "La capienza è obbligatoria")
+    @Min(value = 1, message = "La capienza deve essere almeno 1")
     @Column(nullable = false)
     private Integer capacity;
 

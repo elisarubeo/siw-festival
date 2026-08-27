@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Registrati')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-9 col-md-6 col-lg-5">
+
+                <h1 class="h3 mb-4 text-center">Registrati</h1>
+
+                <form th:action="@{/register}" method="post">
+
+                    <!-- Primo blocco: i campi dell'entita' User.
+                         th:object cambia l'oggetto di riferimento di *{...} -->
+                    <div th:object="${user}">
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nome</label>
+                            <input type="text" id="name" class="form-control"
+                                   th:field="*{name}"
+                                   th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:errors="*{name}">errore</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="surname" class="form-label">Cognome</label>
+                            <input type="text" id="surname" class="form-control"
+                                   th:field="*{surname}"
+                                   th:classappend="${#fields.hasErrors('surname')} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:errors="*{surname}">errore</div>
+                        </div>
+
+                    </div>
+
+                    <!-- Secondo blocco: i campi dell'entita' Credentials -->
+                    <div th:object="${credentials}">
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" id="username" class="form-control"
+                                   th:field="*{username}"
+                                   th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:errors="*{username}">errore</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" id="password" class="form-control"
+                                   th:field="*{password}"
+                                   th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:errors="*{password}">errore</div>
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="btn btn-dark w-100">Crea account</button>
+                </form>
+
+                <p class="text-center text-body-secondary mt-4 mb-0">
+                    Hai gi&agrave; un account? <a th:href="@{/login}">Accedi</a>
+                </p>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

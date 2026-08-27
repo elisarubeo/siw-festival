@@ -39,11 +39,41 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/screenings}">Programma</a>
                 </li>
+
+                <!-- Voce visibile solo agli amministratori. La proiezione .![authority]
+                     trasforma la lista di GrantedAuthority in una lista di stringhe. -->
+                <li class="nav-item dropdown"
+                    th:if="${userDetails != null
+                            and #lists.contains(userDetails.authorities.![authority], 'ADMIN')}">
+                    <a class="nav-link dropdown-toggle" href="#" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">Gestione</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" th:href="@{/directors}">Registi</a></li>
+                        <li><a class="dropdown-item" th:href="@{/theaters}">Sale</a></li>
+                    </ul>
+                </li>
             </ul>
-            <ul class="navbar-nav">
-                <li class="nav-item">
+            <!-- userDetails arriva da GlobalController, che lo aggiunge al model
+                 di ogni richiesta: e' null quando nessuno ha fatto login. -->
+            <ul class="navbar-nav align-items-md-center">
+
+                <li class="nav-item" th:if="${userDetails == null}">
                     <a class="nav-link" th:href="@{/login}">Accedi</a>
                 </li>
+
+                <li class="nav-item" th:unless="${userDetails == null}">
+                    <span class="navbar-text me-2" th:text="${userDetails.username}">username</span>
+                </li>
+
+                <li class="nav-item" th:unless="${userDetails == null}">
+                    <!-- Il logout dev'essere una POST: con CSRF attivo Spring
+                         Security rifiuta il logout via GET. La form fa anche
+                         includere automaticamente il token. -->
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-light btn-sm">Esci</button>
+                    </form>
+                </li>
+
             </ul>
         </div>
     </div>

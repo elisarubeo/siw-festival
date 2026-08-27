@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head(${theater.name})}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+    <div class="container my-5">
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/theaters}">Sale</a></li>
+                <li class="breadcrumb-item active" aria-current="page"
+                    th:text="${theater.name}">Nome</li>
+            </ol>
+        </nav>
+
+        <h1 class="h2 mb-2" th:text="${theater.name}">Nome della sala</h1>
+
+        <p class="text-body-secondary">
+            <span th:text="${theater.address}">Via Roma 1, Roma</span>
+            ·
+            <span th:text="${theater.capacity} + ' posti'">200 posti</span>
+        </p>
+
+        <h2 class="h4 mt-5 mb-3">Proiezioni in questa sala</h2>
+
+        <div th:if="${#lists.isEmpty(theater.screenings)}" class="alert alert-secondary">
+            Nessuna proiezione programmata in questa sala.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(theater.screenings)}" class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th scope="col">Data</th>
+                    <th scope="col">Ora</th>
+                    <th scope="col">Film</th>
+                    <th scope="col">Festival</th>
+                    <th scope="col">Stato</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="screening : ${theater.screenings}">
+                    <td th:text="${screening.date}">2026-09-10</td>
+                    <td th:text="${screening.time}">18:00</td>
+                    <td>
+                        <a th:href="@{/movies/{id}(id=${screening.movie.id})}"
+                           th:text="${screening.movie.title}">Titolo</a>
+                    </td>
+                    <td>
+                        <a th:href="@{/festivals/{id}(id=${screening.festival.id})}"
+                           th:text="${screening.festival.name}">Festival</a>
+                    </td>
+                    <td th:replace="~{fragments/layout :: statusBadge(${screening.status})}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

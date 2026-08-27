@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Nuovo regista')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/directors}">Registi</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Nuovo</li>
+                    </ol>
+                </nav>
+
+                <h1 class="h3 mb-4">Nuovo regista</h1>
+
+                <form th:action="@{/directors}" th:object="${director}" method="post">
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nome</label>
+                        <input type="text" id="name" class="form-control"
+                               th:field="*{name}"
+                               th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:errors="*{name}">errore</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="surname" class="form-label">Cognome</label>
+                        <input type="text" id="surname" class="form-control"
+                               th:field="*{surname}"
+                               th:classappend="${#fields.hasErrors('surname')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:errors="*{surname}">errore</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nationality" class="form-label">
+                            Nazionalit&agrave; <span class="text-body-secondary fw-normal">(facoltativa)</span>
+                        </label>
+                        <input type="text" id="nationality" class="form-control"
+                               th:field="*{nationality}">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="birthDate" class="form-label">
+                            Data di nascita <span class="text-body-secondary fw-normal">(facoltativa)</span>
+                        </label>
+                        <input type="date" id="birthDate" class="form-control"
+                               th:field="*{birthDate}"
+                               th:classappend="${#fields.hasErrors('birthDate')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:errors="*{birthDate}">errore</div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-dark">Salva</button>
+                        <a th:href="@{/directors}" class="btn btn-outline-secondary">Annulla</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

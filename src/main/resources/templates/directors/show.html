@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head(${director.name} + ' ' + ${director.surname})}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+    <div class="container my-5">
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/directors}">Registi</a></li>
+                <li class="breadcrumb-item active" aria-current="page"
+                    th:text="${director.name} + ' ' + ${director.surname}">Nome</li>
+            </ol>
+        </nav>
+
+        <h1 class="h2 mb-3" th:text="${director.name} + ' ' + ${director.surname}">Nome Cognome</h1>
+
+        <p class="text-body-secondary">
+            <span th:if="${director.nationality}" th:text="${director.nationality}">Italiana</span>
+            <span th:if="${director.nationality != null and director.birthDate != null}"> · </span>
+            <span th:if="${director.birthDate}">
+                nato il <span th:text="${director.birthDate}">1970-05-31</span>
+            </span>
+        </p>
+
+        <h2 class="h4 mt-5 mb-3">Film diretti</h2>
+
+        <div th:if="${#lists.isEmpty(director.movies)}" class="alert alert-secondary">
+            Nessun film associato a questo regista.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(director.movies)}"
+             class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="col" th:each="movie : ${director.movies}">
+                <article class="card h-100">
+                    <div class="card-body">
+                        <h3 class="card-title h6 mb-1">
+                            <a class="stretched-link"
+                               th:href="@{/movies/{id}(id=${movie.id})}"
+                               th:text="${movie.title}">Titolo</a>
+                        </h3>
+                        <p class="card-text small text-body-secondary mb-0"
+                           th:text="${movie.year}">2013</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

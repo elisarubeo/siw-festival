@@ -132,9 +132,8 @@
             <article class="card" th:each="review : ${movie.reviews}">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-baseline mb-2">
-                        <!-- User non espone piu' lo username (e' su Credentials):
-                             per ora identifico l'autore con l'id. Vedi nota. -->
-                        <span class="fw-semibold" th:text="'Utente #' + ${review.user.id}">Utente #2</span>
+                        <span class="fw-semibold"
+                              th:text="${review.user.name} + ' ' + ${review.user.surname}">Nome Cognome</span>
                         <span class="text-body-secondary small" th:text="${review.reviewDate}">2025-11-02</span>
                     </div>
                     <p class="mb-2">

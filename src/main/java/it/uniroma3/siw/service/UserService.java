@@ -30,10 +30,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public User getUser(Long id) {
         return userRepository.findById(id).orElse(null);
-
     }
 
 }
