@@ -28,4 +28,9 @@ public class TheaterService {
     public Theater save(Theater theater) {
         return theaterRepository.save(theater);
     }
+
+    @Transactional(readOnly = true)
+    public boolean existsByNameAndAdress(String name, String address) {
+        return theaterRepository.existsByNameAndAddress(name, address);
+    }
 }

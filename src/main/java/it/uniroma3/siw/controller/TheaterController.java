@@ -45,7 +45,10 @@ public class TheaterController {
     @PostMapping("/theaters")
     public String save(@Valid @ModelAttribute("theater") Theater theater,
                        BindingResult bindingResult) {
-
+        if(this.theaterService.existsByNameAndAddress(theater.getName(), theater.getAddress())) {
+            bindingResult.rejectValue("name", "theater.duplicate",
+                    "Questa sala è già presente");
+        }
         if (bindingResult.hasErrors()) {
             return "theaters/form";
         }
