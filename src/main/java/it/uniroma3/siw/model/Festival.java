@@ -13,6 +13,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Festival {
@@ -20,21 +23,27 @@ public class Festival {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "Il nome è obbligatorio")
     @Column(nullable = false)
     private String name;
 
+    @Size(max = 2000, message = "La descrizione non può superare i 2000 caratteri")
     @Column(length = 2000)
     private String description;
 
+    @NotBlank(message = "La città è obbligatoria")
     @Column(nullable = false)
     private String city;
 
+    @NotNull(message = "L'anno è obbligatorio")
     @Column(nullable = false)
     private Integer year;
 
+    @NotNull(message = "La data di inizio è obbligatoria")
     @Column(nullable = false)
     private LocalDate startDate;
 
+    @NotNull(message = "La data di fine è obbligatoria")
     @Column(nullable = false)
     private java.time.LocalDate endDate;
 

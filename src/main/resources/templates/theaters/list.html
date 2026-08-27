@@ -15,6 +15,8 @@
             <a th:href="@{/theaters/new}" class="btn btn-dark">Nuova sala</a>
         </div>
 
+        <div th:replace="~{fragments/layout :: flash}"></div>
+
         <div th:if="${#lists.isEmpty(theaters)}" class="alert alert-secondary">
             Non ci sono sale registrate nel sistema.
         </div>
@@ -24,7 +26,7 @@
 
             <div class="col" th:each="theater : ${theaters}">
                 <article class="card h-100">
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
 
                         <h2 class="card-title h5 mb-1">
                             <a class="stretched-link"
@@ -35,10 +37,13 @@
                         <p class="card-subtitle text-body-secondary mb-2"
                            th:text="${theater.address}">Via Roma 1, Roma</p>
 
-                        <p class="card-text mb-0">
+                        <p class="card-text mb-3">
                             <span class="badge text-bg-light border"
                                   th:text="${theater.capacity} + ' posti'">200 posti</span>
                         </p>
+
+                        <div class="mt-auto pt-2"
+                             th:replace="~{fragments/layout :: adminActions('/theaters', ${theater.id}, 'Eliminare questa sala?')}"></div>
 
                     </div>
                 </article>

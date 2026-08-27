@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="it" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/layout :: head('Nuovo regista')}"></head>
+<!-- Una sola form per creazione e modifica: cambia solo la destinazione della
+     POST, decisa in base alla presenza dell'id. -->
+
+<head th:replace="~{fragments/layout :: head(${director.id == null} ? 'Nuovo regista' : 'Modifica regista')}"></head>
 
 <body class="d-flex flex-column min-vh-100">
 
@@ -15,13 +18,18 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a th:href="@{/directors}">Registi</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Nuovo</li>
+                        <li class="breadcrumb-item active" aria-current="page"
+                            th:text="${director.id == null} ? 'Nuovo' : 'Modifica'">Nuovo</li>
                     </ol>
                 </nav>
 
-                <h1 class="h3 mb-4">Nuovo regista</h1>
+                <h1 class="h3 mb-4"
+                    th:text="${director.id == null} ? 'Nuovo regista' : 'Modifica regista'">Nuovo regista</h1>
 
-                <form th:action="@{/directors}" th:object="${director}" method="post">
+                <form method="post" th:object="${director}"
+                      th:action="${director.id == null}
+                                 ? @{/directors}
+                                 : @{/directors/{id}(id=${director.id})}">
 
                     <div class="mb-3">
                         <label for="name" class="form-label">Nome</label>

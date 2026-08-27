@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head(${movie.id == null} ? 'Nuovo film' : 'Modifica film')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/movies}">Film</a></li>
+                        <li class="breadcrumb-item active" aria-current="page"
+                            th:text="${movie.id == null} ? 'Nuovo' : 'Modifica'">Nuovo</li>
+                    </ol>
+                </nav>
+
+                <h1 class="h3 mb-4"
+                    th:text="${movie.id == null} ? 'Nuovo film' : 'Modifica film'">Nuovo film</h1>
+
+                <form method="post" th:object="${movie}"
+                      th:action="${movie.id == null}
+                                 ? @{/movies}
+                                 : @{/movies/{id}(id=${movie.id})}">
+
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Titolo</label>
+                        <input type="text" id="title" class="form-control"
+                               th:field="*{title}"
+                               th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:errors="*{title}">errore</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label for="year" class="form-label">Anno</label>
+                            <input type="number" id="year" class="form-control"
+                                   th:field="*{year}"
+                                   th:classappend="${#fields.hasErrors('year')} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:errors="*{year}">errore</div>
+                        </div>
+
+                        <div class="col-6 mb-3">
+                            <label for="duration" class="form-label">
+                                Durata <span class="text-body-secondary fw-normal">(minuti)</span>
+                            </label>
+                            <input type="number" id="duration" class="form-control" min="1"
+                                   th:field="*{duration}"
+                                   th:classappend="${#fields.hasErrors('duration')} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:errors="*{duration}">errore</div>
+                        </div>
+                    </div>
+
+                    <!-- Il regista si sceglie tra quelli esistenti. Thymeleaf usa il
+                         convertitore di Spring per trasformare l'id in entita': in
+                         th:value si passa l'id, e il binding fa il resto. -->
+                    <div class="mb-3">
+                        <label for="director" class="form-label">Regista</label>
+                        <select id="director" class="form-select"
+                                th:field="*{director}"
+                                th:classappend="${#fields.hasErrors('director')} ? 'is-invalid'">
+                            <option value="">— scegli un regista —</option>
+                            <option th:each="d : ${directors}"
+                                    th:value="${d.id}"
+                                    th:text="${d.name} + ' ' + ${d.surname}">Nome Cognome</option>
+                        </select>
+                        <div class="invalid-feedback" th:errors="*{director}">errore</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label for="genre" class="form-label">
+                                Genere <span class="text-body-secondary fw-normal">(facoltativo)</span>
+                            </label>
+                            <input type="text" id="genre" class="form-control" th:field="*{genre}">
+                        </div>
+
+                        <div class="col-6 mb-4">
+                            <label for="country" class="form-label">
+                                Paese <span class="text-body-secondary fw-normal">(facoltativo)</span>
+                            </label>
+                            <input type="text" id="country" class="form-control" th:field="*{country}">
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-dark">Salva</button>
+                        <a th:href="@{/movies}" class="btn btn-outline-secondary">Annulla</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

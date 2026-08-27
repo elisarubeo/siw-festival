@@ -66,9 +66,13 @@ public class SecurityConfiguration {
             authorize.requestMatchers("/directors/**").hasAuthority(Credentials.ADMIN_ROLE);
             authorize.requestMatchers("/theaters/**").hasAuthority(Credentials.ADMIN_ROLE);
 
-            authorize.requestMatchers(HttpMethod.GET, "/festivals/new", "/movies/new")
-                    .hasAuthority(Credentials.ADMIN_ROLE);
-            authorize.requestMatchers(HttpMethod.POST, "/festivals", "/movies")
+            /* Festival e film hanno pagine pubbliche, quindi qui si elencano
+               solo i percorsi di amministrazione. Le POST sono tutte
+               amministrative: creazione, modifica ed eliminazione. */
+            authorize.requestMatchers(HttpMethod.GET,
+                    "/festivals/new", "/festivals/*/edit",
+                    "/movies/new", "/movies/*/edit").hasAuthority(Credentials.ADMIN_ROLE);
+            authorize.requestMatchers(HttpMethod.POST, "/festivals/**", "/movies/**")
                     .hasAuthority(Credentials.ADMIN_ROLE);
 
             // funzionalita' pubbliche

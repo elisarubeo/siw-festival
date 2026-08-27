@@ -86,6 +86,32 @@
     </div>
 </footer>
 
+<!-- Messaggi di esito che arrivano da un redirect (RedirectAttributes).
+     Uso: <div th:replace="~{fragments/layout :: flash}"></div> -->
+<div th:fragment="flash">
+    <div th:if="${successMessage}" class="alert alert-success" role="alert"
+         th:text="${successMessage}">esito</div>
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert"
+         th:text="${errorMessage}">errore</div>
+</div>
+
+<!-- Pulsanti Modifica ed Elimina, mostrati solo agli amministratori.
+     basePath e' per esempio "/directors", id l'identificativo dell'entita'.
+     L'eliminazione e' una form POST perche' cambia lo stato del sistema. -->
+<div th:fragment="adminActions(basePath, id, confirmText)" class="d-inline-flex gap-2"
+     th:if="${userDetails != null
+             and #lists.contains(userDetails.authorities.![authority], 'ADMIN')}">
+    <a class="btn btn-sm btn-outline-dark position-relative"
+       th:href="@{{base}/{id}/edit(base=${basePath}, id=${id})}">Modifica</a>
+    <!-- Il messaggio di conferma sta in un attributo data-, non in onsubmit:
+         Thymeleaf non permette di costruire gestori di eventi da variabili.
+         Se ne occupa lo script in fondo alla pagina. -->
+    <form th:action="@{{base}/{id}/delete(base=${basePath}, id=${id})}" method="post"
+          class="position-relative" th:data-confirm="${confirmText}">
+        <button type="submit" class="btn btn-sm btn-outline-danger">Elimina</button>
+    </form>
+</div>
+
 <!-- Badge colorato per lo stato di una proiezione, usato in piu' pagine.
      Uso: <td th:replace="~{fragments/layout :: statusBadge(${screening.status})}"></td> -->
 <td th:fragment="statusBadge(status)" th:switch="${status.name()}">
@@ -98,6 +124,16 @@
 <!-- Serve per il menu a scomparsa su schermi stretti -->
 <div th:fragment="scripts">
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script>
+        // Chiede conferma prima di inviare le form con attributo data-confirm
+        document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!window.confirm(form.dataset.confirm)) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
 </div>
 
 </body>

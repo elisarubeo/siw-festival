@@ -10,7 +10,14 @@
 <main class="flex-grow-1">
     <div class="container my-5">
 
-        <h1 class="h2 mb-4">Film</h1>
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h1 class="h2 mb-0">Film</h1>
+            <a th:href="@{/movies/new}" class="btn btn-dark"
+               th:if="${userDetails != null
+                       and #lists.contains(userDetails.authorities.![authority], 'ADMIN')}">Nuovo film</a>
+        </div>
+
+        <div th:replace="~{fragments/layout :: flash}"></div>
 
         <div th:if="${#lists.isEmpty(movies)}" class="alert alert-secondary">
             Non ci sono film registrati nel sistema.
@@ -42,9 +49,12 @@
                         <p class="card-text small text-body-secondary mb-3" th:if="${movie.country}"
                            th:text="${movie.country}">Italia</p>
 
-                        <p class="mt-auto mb-0" th:if="${movie.genre}">
+                        <p class="mb-3" th:if="${movie.genre}">
                             <span class="badge text-bg-light border" th:text="${movie.genre}">Drammatico</span>
                         </p>
+
+                        <div class="mt-auto pt-2"
+                             th:replace="~{fragments/layout :: adminActions('/movies', ${movie.id}, 'Eliminare questo film?')}"></div>
 
                     </div>
                 </article>

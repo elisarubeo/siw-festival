@@ -15,6 +15,9 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Movie {
@@ -22,16 +25,20 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "Il titolo è obbligatorio")
     @Column(nullable = false)
     private String title;
 
     private String genre;
 
+    @NotNull(message = "L'anno è obbligatorio")
+    @Min(value = 1888, message = "L'anno deve essere successivo al 1888")
     @Column(nullable = false)
     private Integer year;
 
     private String country;
 
+    @Min(value = 1, message = "La durata deve essere di almeno un minuto")
     private Integer duration;
 
     /* lato proprietario della ManyToMany: unica tabella di join del modello */

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="it" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/layout :: head('Nuova sala')}"></head>
+<head th:replace="~{fragments/layout :: head(${theater.id == null} ? 'Nuova sala' : 'Modifica sala')}"></head>
 
 <body class="d-flex flex-column min-vh-100">
 
@@ -15,13 +15,18 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a th:href="@{/theaters}">Sale</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Nuova</li>
+                        <li class="breadcrumb-item active" aria-current="page"
+                            th:text="${theater.id == null} ? 'Nuova' : 'Modifica'">Nuova</li>
                     </ol>
                 </nav>
 
-                <h1 class="h3 mb-4">Nuova sala</h1>
+                <h1 class="h3 mb-4"
+                    th:text="${theater.id == null} ? 'Nuova sala' : 'Modifica sala'">Nuova sala</h1>
 
-                <form th:action="@{/theaters}" th:object="${theater}" method="post">
+                <form method="post" th:object="${theater}"
+                      th:action="${theater.id == null}
+                                 ? @{/theaters}
+                                 : @{/theaters/{id}(id=${theater.id})}">
 
                     <div class="mb-3">
                         <label for="name" class="form-label">Nome</label>

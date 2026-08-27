@@ -10,7 +10,14 @@
 <main class="flex-grow-1">
     <div class="container my-5">
 
-        <h1 class="h2 mb-4">Festival</h1>
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h1 class="h2 mb-0">Festival</h1>
+            <a th:href="@{/festivals/new}" class="btn btn-dark"
+               th:if="${userDetails != null
+                       and #lists.contains(userDetails.authorities.![authority], 'ADMIN')}">Nuovo festival</a>
+        </div>
+
+        <div th:replace="~{fragments/layout :: flash}"></div>
 
         <div th:if="${#lists.isEmpty(festivals)}" class="alert alert-secondary">
             Non ci sono festival registrati nel sistema.
@@ -21,7 +28,7 @@
 
             <div class="col" th:each="festival : ${festivals}">
                 <article class="card h-100">
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
 
                         <h2 class="card-title h5 mb-1">
                             <a class="stretched-link"
@@ -45,6 +52,9 @@
                            th:text="${#strings.abbreviate(festival.description, 140)}">
                             Breve descrizione del festival.
                         </p>
+
+                        <div class="mt-auto pt-2"
+                             th:replace="~{fragments/layout :: adminActions('/festivals', ${festival.id}, 'Eliminare questo festival?')}"></div>
 
                     </div>
                 </article>
