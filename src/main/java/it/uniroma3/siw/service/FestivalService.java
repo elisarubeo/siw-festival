@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import it.uniroma3.siw.exception.EntityInUseException;
 import it.uniroma3.siw.exception.ResourceNotFoundException;
 import it.uniroma3.siw.model.Festival;
+import it.uniroma3.siw.model.Movie;
 import it.uniroma3.siw.repository.FestivalRepository;
 import it.uniroma3.siw.repository.MovieRepository;
 import it.uniroma3.siw.repository.ScreeningRepository;
@@ -51,6 +52,52 @@ public class FestivalService {
     @Transactional
     public Festival save(Festival festival) {
         return festivalRepository.save(festival);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Movie> findMoviesNotInFestival(Long festivalId) {
+        return movieRepository.findNotInFestival(festivalId);
+    }
+
+    @Transactional
+    public void addMovie(Long festivalId, Long movieId) {
+        Festival festival = festivalRepository.findById(festivalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessun festival con id " + festivalId));
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessun film con id " + movieId));
+
+        // gia' associato: non succede niente
+        if (movie.getFestivals().contains(festival)) {
+            return;
+        }
+
+        /* Movie.festivals e' il LATO PROPRIETARIO: e' questa riga che fa
+           scrivere a Hibernate la riga nella tabella di join. */
+        movie.getFestivals().add(festival);
+
+        /* Il lato inverso si aggiorna solo per coerenza dell'oggetto in
+           memoria: senza, il festival appena letto non mostrerebbe il film. */
+        festival.getMovies().add(movie);
+
+    }
+
+    @Transactional
+    public void removeMovie(Long festivalId, Long movieId) {
+        Festival festival = festivalRepository.findById(festivalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessun festival con id " + festivalId));
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessun film con id " + movieId));
+
+        /* Resterebbero proiezioni di un film che non partecipa
+           piu' al festival. */
+        if (screeningRepository.existsByFestivalIdAndMovieId(festivalId, movieId)) {
+            throw new EntityInUseException("Non è possibile togliere "
+                    + movie.getTitle() + " da " + festival.getName()
+                    + ": ha delle proiezioni programmate in questo festival.");
+        }
+
+        movie.getFestivals().remove(festival);
+        festival.getMovies().remove(movie);
     }
 
     @Transactional

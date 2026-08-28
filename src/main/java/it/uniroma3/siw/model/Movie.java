@@ -48,6 +48,9 @@ public class Movie {
             inverseJoinColumns = @JoinColumn(name = "festival_id"))
     private List<Festival> festivals = new ArrayList<>();
 
+    /* @NotNull serve per la validazione della form: optional/nullable sono
+       vincoli JPA, che il database fa rispettare ma che @Valid non guarda. */
+    @NotNull(message = "Il regista è obbligatorio")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "director_id", nullable = false)
     private Director director;

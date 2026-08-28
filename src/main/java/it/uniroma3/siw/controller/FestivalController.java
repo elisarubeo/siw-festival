@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import it.uniroma3.siw.exception.EntityInUseException;
@@ -14,6 +15,7 @@ import it.uniroma3.siw.exception.ResourceNotFoundException;
 import it.uniroma3.siw.model.Festival;
 import it.uniroma3.siw.service.FestivalService;
 import jakarta.validation.Valid;
+
 
 @Controller
 public class FestivalController {
@@ -35,6 +37,10 @@ public class FestivalController {
         Festival festival = this.festivalService.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Nessun festival con id " + id));
         model.addAttribute("festival", festival);
+        /* Serve solo all'amministratore, per la tendina "aggiungi film".
+           La calcoliamo sempre per non mettere logica di sicurezza qui:
+           il template la mostra soltanto a chi ha il ruolo ADMIN. */
+        model.addAttribute("addableMovies", this.festivalService.findMoviesNotInFestival(id));
         return "festivals/show";
     }
 
@@ -89,6 +95,28 @@ public class FestivalController {
         return "redirect:/festivals/" + id;
     }
 
+    @PostMapping("/festivals/{id}/movies")
+    public String addMovie(@PathVariable("id") Long id,
+                           @RequestParam("movieId") Long movieId,
+                           RedirectAttributes redirectAttributes) {
+        this.festivalService.addMovie(id, movieId);
+        redirectAttributes.addFlashAttribute("successMessage", "Film aggiunto al festival.");
+        return "redirect:/festivals/" + id;
+    }
+
+    @PostMapping("/festivals/{id}/movies/{movieId}/delete")
+    public String removeMovie(@PathVariable("id") Long id,
+                              @PathVariable("movieId") Long movieId,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            this.festivalService.removeMovie(id, movieId);
+            redirectAttributes.addFlashAttribute("successMessage", "Film rimosso dal festival.");
+        } catch (EntityInUseException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/festivals/" + id;
+    }
+
     @PostMapping("/festivals/{id}/delete")
     public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
@@ -99,4 +127,5 @@ public class FestivalController {
         }
         return "redirect:/festivals";
     }
+    
 }
