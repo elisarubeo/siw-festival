@@ -38,6 +38,7 @@ public class Movie {
 
     private String country;
 
+    @NotNull(message = "La durata è obbligatoria")
     @Min(value = 1, message = "La durata deve essere di almeno un minuto")
     private Integer duration;
 

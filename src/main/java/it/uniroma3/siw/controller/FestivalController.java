@@ -1,5 +1,9 @@
 package it.uniroma3.siw.controller;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,20 +14,26 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import it.uniroma3.siw.exception.BusinessRuleException;
 import it.uniroma3.siw.exception.EntityInUseException;
 import it.uniroma3.siw.exception.ResourceNotFoundException;
 import it.uniroma3.siw.model.Festival;
 import it.uniroma3.siw.service.FestivalService;
+import it.uniroma3.siw.service.ScreeningService;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @Controller
 public class FestivalController {
 
     private FestivalService festivalService;
+    private ScreeningService screeningService;
 
-    public FestivalController(FestivalService festivalService) {
+    public FestivalController(FestivalService festivalService, ScreeningService screeningService) {
         this.festivalService = festivalService;
+        this.screeningService = screeningService;
     }
 
     @GetMapping("/festivals")
@@ -127,5 +137,24 @@ public class FestivalController {
         }
         return "redirect:/festivals";
     }
+
+    @PostMapping("/festivals/{id}/screenings")
+    public String addScreening(@PathVariable("id") Long id,
+                               @RequestParam("movieId") Long movieId,
+                               @RequestParam("theaterId") Long theaterId,
+                               @RequestParam("date")
+                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                               @RequestParam("time")
+                               @DateTimeFormat(pattern = "HH:mm") LocalTime time,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            this.screeningService.schedule(id, movieId, theaterId, date, time);
+            redirectAttributes.addFlashAttribute("successMessage", "Proiezione programmata.");
+        } catch (BusinessRuleException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/festivals/" + id;
+    }
+    
     
 }

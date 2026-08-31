@@ -25,4 +25,5 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Query("select m from Movie m where :festivalId not in "
          + "(select f.id from m.festivals f) order by m.title")
     List<Movie> findNotInFestival(@Param("festivalId") Long festivalId);
+
 }

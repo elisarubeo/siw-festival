@@ -71,12 +71,8 @@ public class FestivalService {
             return;
         }
 
-        /* Movie.festivals e' il LATO PROPRIETARIO: e' questa riga che fa
-           scrivere a Hibernate la riga nella tabella di join. */
         movie.getFestivals().add(festival);
 
-        /* Il lato inverso si aggiorna solo per coerenza dell'oggetto in
-           memoria: senza, il festival appena letto non mostrerebbe il film. */
         festival.getMovies().add(movie);
 
     }
