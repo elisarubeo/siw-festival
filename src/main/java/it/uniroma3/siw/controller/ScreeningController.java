@@ -3,6 +3,7 @@ package it.uniroma3.siw.controller;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import org.springframework.cglib.core.Local;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +28,20 @@ public class ScreeningController {
     public ScreeningController(ScreeningService screeningService, TheaterService theaterService) {
         this.screeningService = screeningService;
         this.theaterService = theaterService;
+    }
+
+    @GetMapping("/screenings")
+    public String list(@RequestParam(required = false)
+                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                       Model model) {
+
+        LocalDate today = LocalDate.now();
+        LocalDate from = (date == null || date.isBefore(today)) ? today : date;
+
+        model.addAttribute("screenings", this.screeningService.findFutureScreenings(from));
+        model.addAttribute("selectedDate", from);
+        model.addAttribute("today", today);
+        return "screenings/list";
     }
 
     @GetMapping("/screenings/{id}/edit")

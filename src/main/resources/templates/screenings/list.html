@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Programma')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+
+    <section class="hero text-white py-5">
+        <div class="container">
+            <h1 class="h1 fw-bold mb-2">Programma delle proiezioni</h1>
+            <p class="lead mb-0">
+                Tutte le proiezioni in calendario, festival per festival.
+            </p>
+        </div>
+    </section>
+
+    <div class="container my-5">
+
+        <div th:replace="~{fragments/layout :: flash}"></div>
+
+        <!-- Filtro per data. E' una GET perche' non modifica nulla: il
+             risultato finisce nell'URL ed e' quindi condivisibile e
+             ricaricabile. Per questo non serve il token CSRF. -->
+        <form method="get" th:action="@{/screenings}" class="row g-2 align-items-end mb-4">
+            <div class="col-auto">
+                <label for="date" class="form-label small text-body-secondary">
+                    A partire dal
+                </label>
+                <input type="date" id="date" name="date" class="form-control"
+                       th:value="${selectedDate}" th:min="${today}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-dark">Filtra</button>
+            </div>
+            <div class="col-auto" th:if="${selectedDate != today}">
+                <a th:href="@{/screenings}" class="btn btn-outline-secondary">Da oggi</a>
+            </div>
+        </form>
+
+        <div th:if="${#lists.isEmpty(screenings)}" class="alert alert-secondary">
+            <span th:if="${selectedDate == today}">
+                Non c'&egrave; ancora nessuna proiezione in programma.
+            </span>
+            <span th:unless="${selectedDate == today}">
+                Nessuna proiezione a partire dal
+                <span th:text="${selectedDate}">2026-09-01</span>.
+            </span>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(screenings)}" class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th scope="col">Data</th>
+                    <th scope="col">Ora</th>
+                    <th scope="col">Film</th>
+                    <th scope="col">Festival</th>
+                    <th scope="col">Sala</th>
+                    <th scope="col">Stato</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="screening : ${screenings}">
+                    <td th:text="${screening.date}">2026-09-10</td>
+                    <td th:text="${screening.time}">18:00</td>
+                    <td>
+                        <a th:href="@{/movies/{id}(id=${screening.movie.id})}"
+                           th:text="${screening.movie.title}">Titolo</a>
+                    </td>
+                    <td>
+                        <a th:href="@{/festivals/{id}(id=${screening.festival.id})}"
+                           th:text="${screening.festival.name}">Festival</a>
+                    </td>
+                    <td>
+                        <span th:text="${screening.theater.name}">Sala Fellini</span>
+                        <span class="text-body-secondary small d-block"
+                              th:text="${screening.theater.address}">indirizzo</span>
+                    </td>
+                    <td th:replace="~{fragments/layout :: statusBadge(${screening.status})}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

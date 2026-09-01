@@ -31,4 +31,7 @@ public interface ScreeningRepository extends JpaRepository<Screening, Long> {
                                                                LocalDate date,
                                                                ScreeningStatus status,
                                                                Long id);
+
+    List<Screening> findByDateGreaterThanEqualOrderByDateAscTimeAsc(LocalDate date);
+                                    
 }

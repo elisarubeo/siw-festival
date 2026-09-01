@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -159,5 +160,10 @@ public class ScreeningService {
         screening.setStatus(ScreeningStatus.CANCELLED);
 
         return screening.getFestival().getId();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Screening> findFutureScreenings(LocalDate date) {
+        return screeningRepository.findByDateGreaterThanEqualOrderByDateAscTimeAsc(date);
     }
 }
