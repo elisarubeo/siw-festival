@@ -59,6 +59,24 @@ public class ScreeningService {
         Theater theater = theaterRepository.findById(theaterId)
                 .orElseThrow(() -> new ResourceNotFoundException("Nessuna sala con id " + theaterId));
 
+        validate(festival, movieId, theaterId, date, time, null); //ancora non esiste la proiezione, quindi screeningIdToIgnore=null
+
+        Screening screening = new Screening();
+        screening.setFestival(festival);
+        screening.setMovie(movie);
+        screening.setTheater(theater);
+        screening.setDate(date);
+        screening.setTime(time);
+        screening.setStatus(ScreeningStatus.SCHEDULED);
+
+        return screeningRepository.save(screening);
+    }
+
+    private void validate(Festival festival, Long movieId, Long theaterId, LocalDate date, LocalTime time, Long screeningIdToIgnore) {
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessun film con id " + movieId));
+        Theater theater = theaterRepository.findById(theaterId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessuna sala con id " + theaterId));
         // 1. il film deve partecipare al festival
         if (!movie.getFestivals().contains(festival)) {
             throw new BusinessRuleException(movie.getTitle()
@@ -73,17 +91,8 @@ public class ScreeningService {
         }
 
         // 3. la sala deve essere libera per tutta la durata del film
-        checkTheaterIsFree(theater, date, time, movie.getDuration(), null);
+        checkTheaterIsFree(theater, date, time, movie.getDuration(), screeningIdToIgnore);
 
-        Screening screening = new Screening();
-        screening.setFestival(festival);
-        screening.setMovie(movie);
-        screening.setTheater(theater);
-        screening.setDate(date);
-        screening.setTime(time);
-        screening.setStatus(ScreeningStatus.SCHEDULED);
-
-        return screeningRepository.save(screening);
     }
 
     /* Verifica che la sala sia libera nell'intervallo occupato dalla nuova proiezione */
@@ -93,11 +102,17 @@ public class ScreeningService {
         LocalTime end = start.plusMinutes(durationMinutes);
 
         /* Le proiezioni annullate non occupano la sala, quindi restano fuori. */
-        List<Screening> sameDay = (screeningIdToIgnore == null)
-                ? screeningRepository.findByTheaterIdAndDateAndStatusNot(
-                        theater.getId(), date, ScreeningStatus.CANCELLED)
-                : screeningRepository.findByTheaterIdAndDateAndStatusNotAndIdNot(
-                        theater.getId(), date, ScreeningStatus.CANCELLED, screeningIdToIgnore);
+        List<Screening> sameDay;
+        // sto creando una nuova proiezione, quindi non devo escludere nessuna proiezione esistente
+        if (screeningIdToIgnore == null) {
+            sameDay = screeningRepository.findByTheaterIdAndDateAndStatusNot(
+                    theater.getId(), date, ScreeningStatus.CANCELLED);
+        }
+        // sto modificando una proiezione esistente, quindi devo escludere la proiezione stessa
+        else {
+            sameDay = screeningRepository.findByTheaterIdAndDateAndStatusNotAndIdNot(
+                    theater.getId(), date, ScreeningStatus.CANCELLED, screeningIdToIgnore);
+        }
 
         for (Screening other : sameDay) {
             LocalTime otherStart = other.getTime();
@@ -110,5 +125,39 @@ public class ScreeningService {
                         + " (" + other.getMovie().getTitle() + ").");
             }
         }
+    }
+
+    @Transactional
+    public Long removeScreening(Long id){
+        Screening screening = screeningRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessuna proiezione con id " + id));
+        screeningRepository.delete(screening);
+        return screening.getFestival().getId();
+    }
+
+    @Transactional
+    public Long reschedule(Long screeningId, Long movieId, Long theaterId, LocalDate date, LocalTime time) {
+        Screening screening = screeningRepository.findById(screeningId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessuna proiezione con id " + screeningId));
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessun film con id " + movieId));
+        Theater theater = theaterRepository.findById(theaterId)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessuna sala con id " + theaterId));
+        // cambiano film e sala, il festival resta lo stesso
+        validate(screening.getFestival(), movieId, theaterId, date, time, screeningId);
+        screening.setMovie(movie);
+        screening.setTheater(theater);
+        screening.setDate(date);
+        screening.setTime(time);
+        return screening.getFestival().getId();
+    }
+
+    @Transactional
+    public Long cancelScreening(Long id) {
+        Screening screening = screeningRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessuna proiezione con id " + id));
+        screening.setStatus(ScreeningStatus.CANCELLED);
+
+        return screening.getFestival().getId();
     }
 }

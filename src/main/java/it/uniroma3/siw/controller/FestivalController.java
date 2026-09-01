@@ -20,6 +20,7 @@ import it.uniroma3.siw.exception.ResourceNotFoundException;
 import it.uniroma3.siw.model.Festival;
 import it.uniroma3.siw.service.FestivalService;
 import it.uniroma3.siw.service.ScreeningService;
+import it.uniroma3.siw.service.TheaterService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -30,10 +31,14 @@ public class FestivalController {
 
     private FestivalService festivalService;
     private ScreeningService screeningService;
+    private TheaterService theaterService;
 
-    public FestivalController(FestivalService festivalService, ScreeningService screeningService) {
+    public FestivalController(FestivalService festivalService,
+                              ScreeningService screeningService,
+                              TheaterService theaterService) {
         this.festivalService = festivalService;
         this.screeningService = screeningService;
+        this.theaterService = theaterService;
     }
 
     @GetMapping("/festivals")
@@ -51,6 +56,8 @@ public class FestivalController {
            La calcoliamo sempre per non mettere logica di sicurezza qui:
            il template la mostra soltanto a chi ha il ruolo ADMIN. */
         model.addAttribute("addableMovies", this.festivalService.findMoviesNotInFestival(id));
+        // servono alla form di programmazione di una proiezione
+        model.addAttribute("theaters", this.theaterService.findAll());
         return "festivals/show";
     }
 
@@ -155,6 +162,6 @@ public class FestivalController {
         }
         return "redirect:/festivals/" + id;
     }
-    
-    
+
+
 }

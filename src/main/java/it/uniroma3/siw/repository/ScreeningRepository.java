@@ -21,15 +21,12 @@ public interface ScreeningRepository extends JpaRepository<Screening, Long> {
     boolean existsByFestivalIdAndMovieId(Long festivalId, Long movieId);
 
     /* Le proiezioni della stessa sala nello stesso giorno, escluse quelle
-       annullate: sono quelle con cui la nuova proiezione potrebbe accavallarsi.
-       Non serve @Query: il nome basta a Spring Data per costruirla, e cosi'
-       i tipi dei parametri li controlla il compilatore. */
+       annullate: sono quelle con cui la nuova proiezione potrebbe accavallarsi. */
     List<Screening> findByTheaterIdAndDateAndStatusNot(Long theaterId,
                                                        LocalDate date,
                                                        ScreeningStatus status);
 
-    /* Variante per la modifica: esclude la proiezione che si sta spostando,
-       altrimenti risulterebbe sempre in conflitto con se stessa. */
+    /* Variante per la modifica: esclude la proiezione che si sta spostando */
     List<Screening> findByTheaterIdAndDateAndStatusNotAndIdNot(Long theaterId,
                                                                LocalDate date,
                                                                ScreeningStatus status,

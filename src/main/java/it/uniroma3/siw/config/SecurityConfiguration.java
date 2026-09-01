@@ -71,8 +71,14 @@ public class SecurityConfiguration {
                amministrative: creazione, modifica ed eliminazione. */
             authorize.requestMatchers(HttpMethod.GET,
                     "/festivals/new", "/festivals/*/edit",
-                    "/movies/new", "/movies/*/edit").hasAuthority(Credentials.ADMIN_ROLE);
-            authorize.requestMatchers(HttpMethod.POST, "/festivals/**", "/movies/**")
+                    "/movies/new", "/movies/*/edit",
+                    "/screenings/*/edit").hasAuthority(Credentials.ADMIN_ROLE);
+
+            /* Tutte le POST su queste risorse sono amministrative: creazione,
+               modifica, eliminazione, annullamento. Sulle proiezioni la GET
+               resta invece pubblica, perche' il programma lo consultano tutti. */
+            authorize.requestMatchers(HttpMethod.POST,
+                    "/festivals/**", "/movies/**", "/screenings/**")
                     .hasAuthority(Credentials.ADMIN_ROLE);
 
             // funzionalita' pubbliche
@@ -80,7 +86,7 @@ public class SecurityConfiguration {
                     "/", "/index", "/register", "/login",
                     "/festivals", "/festivals/**",
                     "/movies", "/movies/**",
-                    "/screenings", "/api/**").permitAll();
+                    "/screenings", "/screenings/**", "/api/**").permitAll();
             authorize.requestMatchers(HttpMethod.POST, "/register").permitAll();
 
             // tutto il resto richiede un utente autenticato

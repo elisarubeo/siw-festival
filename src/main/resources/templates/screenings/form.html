@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Modifica proiezione')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/festivals}">Festival</a></li>
+                        <li class="breadcrumb-item">
+                            <a th:href="@{/festivals/{id}(id=${screening.festival.id})}"
+                               th:text="${screening.festival.name}">Festival</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Modifica proiezione</li>
+                    </ol>
+                </nav>
+
+                <h1 class="h3 mb-4">Modifica proiezione</h1>
+
+                <div th:replace="~{fragments/layout :: flash}"></div>
+
+                <form th:action="@{/screenings/{id}(id=${screening.id})}" method="post">
+
+                    <div class="mb-3">
+                        <label for="movieId" class="form-label">Film</label>
+                        <select id="movieId" name="movieId" class="form-select" required>
+                            <option th:each="m : ${movies}"
+                                    th:value="${m.id}"
+                                    th:selected="${m.id == screening.movie.id}"
+                                    th:text="${m.title} + ' (' + ${m.duration} + ' min)'">Titolo</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="theaterId" class="form-label">Sala</label>
+                        <select id="theaterId" name="theaterId" class="form-select" required>
+                            <option th:each="t : ${theaters}"
+                                    th:value="${t.id}"
+                                    th:selected="${t.id == screening.theater.id}"
+                                    th:text="${t.name}">Sala</option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-4">
+                            <label for="date" class="form-label">Data</label>
+                            <input type="date" id="date" name="date" class="form-control" required
+                                   th:value="${screening.date}"
+                                   th:min="${screening.festival.startDate}"
+                                   th:max="${screening.festival.endDate}">
+                        </div>
+
+                        <div class="col-6 mb-4">
+                            <label for="time" class="form-label">Ora</label>
+                            <input type="time" id="time" name="time" class="form-control" required
+                                   th:value="${screening.time}">
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-dark">Salva</button>
+                        <a th:href="@{/festivals/{id}(id=${screening.festival.id})}"
+                           class="btn btn-outline-secondary">Annulla</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

@@ -108,9 +108,14 @@ public class Screening {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (obj == null || getClass() != obj.getClass())
+        /* instanceof e non getClass(): con le associazioni LAZY Hibernate
+           consegna dei proxy, la cui classe e' una sottoclasse generata a
+           runtime. getClass() != obj.getClass() farebbe risultare diversi un
+           proxy e l'entita' che rappresenta. */
+        if (!(obj instanceof Screening other))
             return false;
-        Screening other = (Screening) obj;
-        return id != null && id.equals(other.id);
+        /* getId() e non other.id: su un proxy l'accesso diretto al campo
+           restituisce null, il getter invece lo inizializza. */
+        return id != null && id.equals(other.getId());
     }
 }

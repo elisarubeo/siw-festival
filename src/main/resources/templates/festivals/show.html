@@ -108,6 +108,56 @@
         <!-- ====================== PROGRAMMA ======================== -->
         <h2 class="h4 mt-5 mb-3">Programma delle proiezioni</h2>
 
+        <!-- Programmazione di una proiezione: solo amministratori -->
+        <form th:action="@{/festivals/{id}/screenings(id=${festival.id})}" method="post"
+              class="row g-2 align-items-end mb-4"
+              th:if="${userDetails != null
+                      and #lists.contains(userDetails.authorities.![authority], 'ADMIN')}">
+
+            <div class="col-12 col-md-4">
+                <label for="scrMovieId" class="form-label small text-body-secondary">Film</label>
+                <select id="scrMovieId" name="movieId" class="form-select" required
+                        th:disabled="${#lists.isEmpty(festival.movies)}">
+                    <option value="">— scegli —</option>
+                    <!-- solo i film che partecipano a questo festival -->
+                    <option th:each="m : ${festival.movies}"
+                            th:value="${m.id}"
+                            th:text="${m.title} + ' (' + ${m.duration} + ' min)'">Titolo</option>
+                </select>
+            </div>
+
+            <div class="col-12 col-md-3">
+                <label for="scrTheaterId" class="form-label small text-body-secondary">Sala</label>
+                <select id="scrTheaterId" name="theaterId" class="form-select" required>
+                    <option value="">— scegli —</option>
+                    <option th:each="t : ${theaters}"
+                            th:value="${t.id}" th:text="${t.name}">Sala</option>
+                </select>
+            </div>
+
+            <div class="col-6 col-md-2">
+                <label for="scrDate" class="form-label small text-body-secondary">Data</label>
+                <input type="date" id="scrDate" name="date" class="form-control" required
+                       th:min="${festival.startDate}" th:max="${festival.endDate}">
+            </div>
+
+            <div class="col-6 col-md-2">
+                <label for="scrTime" class="form-label small text-body-secondary">Ora</label>
+                <input type="time" id="scrTime" name="time" class="form-control" required>
+            </div>
+
+            <div class="col-12 col-md-1">
+                <button type="submit" class="btn btn-dark w-100"
+                        th:disabled="${#lists.isEmpty(festival.movies)}">Aggiungi</button>
+            </div>
+
+            <div class="col-12" th:if="${#lists.isEmpty(festival.movies)}">
+                <span class="small text-body-secondary">
+                    Associa prima almeno un film al festival.
+                </span>
+            </div>
+        </form>
+
         <div th:if="${#lists.isEmpty(festival.screenings)}" class="alert alert-secondary">
             Il programma di questo festival non &egrave; ancora disponibile.
         </div>
@@ -121,6 +171,9 @@
                     <th scope="col">Film</th>
                     <th scope="col">Sala</th>
                     <th scope="col">Stato</th>
+                    <th scope="col"
+                        th:if="${userDetails != null
+                                and #lists.contains(userDetails.authorities.![authority], 'ADMIN')}"></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -133,6 +186,28 @@
                     </td>
                     <td th:text="${screening.theater.name}">Sala Fellini</td>
                     <td th:replace="~{fragments/layout :: statusBadge(${screening.status})}"></td>
+
+                    <td class="text-end"
+                        th:if="${userDetails != null
+                                and #lists.contains(userDetails.authorities.![authority], 'ADMIN')}">
+                        <div class="d-inline-flex gap-1">
+                            <a class="btn btn-sm btn-outline-dark"
+                               th:href="@{/screenings/{id}/edit(id=${screening.id})}">Modifica</a>
+
+                            <!-- Annullare non cancella: lascia la proiezione visibile
+                                 nel programma e libera la sala. -->
+                            <form th:action="@{/screenings/{id}/cancel(id=${screening.id})}" method="post"
+                                  th:if="${screening.status.name() != 'CANCELLED'}"
+                                  th:data-confirm="'Annullare questa proiezione?'">
+                                <button type="submit" class="btn btn-sm btn-outline-warning">Annulla</button>
+                            </form>
+
+                            <form th:action="@{/screenings/{id}/delete(id=${screening.id})}" method="post"
+                                  th:data-confirm="'Eliminare definitivamente questa proiezione?'">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Elimina</button>
+                            </form>
+                        </div>
+                    </td>
                 </tr>
                 </tbody>
             </table>
