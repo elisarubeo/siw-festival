@@ -19,6 +19,8 @@ export interface LoginRequest {
 export interface LoginResponse {
   token: string
   username: string
+  /** id dell'utente: serve a riconoscere le proprie recensioni */
+  userId: number
   /* i ruoli nel database sono "DEFAULT" e "ADMIN", non "USER": vedi
      Credentials.DEFAULT_ROLE nel backend */
   role: string
@@ -42,10 +44,12 @@ export interface Review {
   rating: number
   /** LocalDate lato Java: "2026-09-02" */
   reviewDate: string
+  /* si confronta con userId di LoginResponse per sapere se la recensione
+     e' dell'utente collegato. E' un id e non uno username perche' User non
+     ha alcun riferimento verso Credentials nel modello del backend. */
+  authorId: number
   authorName: string
   authorSurname: string
-  /** serve a capire se la recensione e' dell'utente collegato */
-  authorUsername: string
 }
 
 export interface ReviewRequest {
@@ -54,8 +58,9 @@ export interface ReviewRequest {
 }
 
 export interface ReviewStats {
-  average: number | null
-  total: number
+  /** null quando il film non ha ancora recensioni */
+  averageRating: number | null
+  totalReviews: number
   /** voto (1..5) -> quante recensioni con quel voto */
-  distribution: Record<number, number>
+  ratingDistribution: Record<number, number>
 }

@@ -13,10 +13,13 @@ import { TOKEN_KEY } from '../services/api'
 
 const USERNAME_KEY = 'siw.username'
 const ROLE_KEY = 'siw.role'
+const USERID_KEY = 'siw.userId'
 
 interface AuthContextValue {
   token: string | null
   username: string | null
+  /** si confronta con ReviewDto.authorId per riconoscere le proprie recensioni */
+  userId: number | null
   role: string | null
   isAuthenticated: boolean
   isAdmin: boolean
@@ -29,6 +32,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)
+  const [userId, setUserId] = useState<number | null>(null)
   const [role, setRole] = useState<string | null>(null)
 
   /**
@@ -39,6 +43,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setToken(localStorage.getItem(TOKEN_KEY))
     setUsername(localStorage.getItem(USERNAME_KEY))
+    const salvato = localStorage.getItem(USERID_KEY)
+    setUserId(salvato === null ? null : Number(salvato))
     setRole(localStorage.getItem(ROLE_KEY))
   }, [])
 
@@ -48,24 +54,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
        ridisegnare i componenti: servono entrambi, non e' una ripetizione. */
     localStorage.setItem(TOKEN_KEY, risposta.token)
     localStorage.setItem(USERNAME_KEY, risposta.username)
+    localStorage.setItem(USERID_KEY, String(risposta.userId))
     localStorage.setItem(ROLE_KEY, risposta.role)
     setToken(risposta.token)
     setUsername(risposta.username)
+    setUserId(risposta.userId)
     setRole(risposta.role)
   }
 
   function logout() {
     localStorage.removeItem(TOKEN_KEY)
     localStorage.removeItem(USERNAME_KEY)
+    localStorage.removeItem(USERID_KEY)
     localStorage.removeItem(ROLE_KEY)
     setToken(null)
     setUsername(null)
+    setUserId(null)
     setRole(null)
   }
 
   const value: AuthContextValue = {
     token,
     username,
+    userId,
     role,
     isAuthenticated: token !== null,
     isAdmin: role === 'ADMIN',

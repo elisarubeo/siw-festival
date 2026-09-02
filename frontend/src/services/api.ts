@@ -39,6 +39,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem(TOKEN_KEY)
       localStorage.removeItem('siw.username')
+      localStorage.removeItem('siw.userId')
       localStorage.removeItem('siw.role')
       /* Non si usa useNavigate: qui siamo fuori da un componente React.
          Il controllo evita un ciclo infinito se e' il login stesso a fallire. */

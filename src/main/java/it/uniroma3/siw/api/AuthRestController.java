@@ -16,6 +16,7 @@ import it.uniroma3.siw.dto.ApiError;
 import it.uniroma3.siw.dto.LoginRequest;
 import it.uniroma3.siw.dto.LoginResponse;
 import it.uniroma3.siw.model.Credentials;
+import it.uniroma3.siw.service.CredentialsService;
 import it.uniroma3.siw.service.JwtService;
 import jakarta.validation.Valid;
 
@@ -31,11 +32,14 @@ public class AuthRestController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final CredentialsService credentialsService;
 
     public AuthRestController(AuthenticationManager authenticationManager,
-                              JwtService jwtService) {
+                              JwtService jwtService,
+                              CredentialsService credentialsService) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.credentialsService = credentialsService;
     }
 
     @PostMapping("/login")
@@ -56,8 +60,15 @@ public class AuthRestController {
 
             String token = this.jwtService.generateToken(authentication.getName(), role);
 
+            /* Il ponte username -> User: nel modello Credentials punta a User,
+               ma non viceversa, quindi si passa sempre da qui. Una query in
+               piu' al solo momento del login. */
+            Long userId = this.credentialsService.getCredentials(authentication.getName())
+                    .map(credentials -> credentials.getUser().getId())
+                    .orElse(null);
+
             return ResponseEntity.ok(
-                    new LoginResponse(token, authentication.getName(), role));
+                    new LoginResponse(token, authentication.getName(), userId, role));
 
         } catch (BadCredentialsException e) {
             /* 401 e non 500: credenziali sbagliate e' un esito previsto del
