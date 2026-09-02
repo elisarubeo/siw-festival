@@ -122,7 +122,15 @@
         </div>
 
         <!-- ====================== RECENSIONI ======================== -->
-        <h2 class="h4 mt-5 mb-3">Recensioni</h2>
+        <!-- Le recensioni si leggono qui, ma scriverle, modificarle ed
+             eliminarle avviene nella parte React, servita da /reviews. -->
+        <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
+            <h2 class="h4 mb-0">Recensioni</h2>
+            <a class="btn btn-sm btn-primary"
+               th:href="@{/reviews/movies/{id}(id=${movie.id})}">
+                Scrivi una recensione
+            </a>
+        </div>
 
         <div th:if="${#lists.isEmpty(movie.reviews)}" class="alert alert-secondary">
             Nessuna recensione per questo film.

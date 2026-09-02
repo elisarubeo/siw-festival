@@ -6,7 +6,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ControllerAdvice
+/* basePackages e' indispensabile: senza, questo gestore cattura anche le
+   eccezioni delle chiamate /api — comprese quelle sollevate quando nessun
+   controller corrisponde all'indirizzo — e restituisce una pagina HTML dove
+   React si aspetta del JSON. Le API hanno il loro ApiExceptionHandler. */
+@ControllerAdvice(basePackages = "it.uniroma3.siw.controller")
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)

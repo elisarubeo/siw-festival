@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Frontend React ###
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+# NOTA: src/main/resources/static/reviews/ (il build) NON e' ignorato di
+# proposito: va versionato, cosi' il progetto si esegue senza avere Node.

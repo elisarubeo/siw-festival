@@ -28,6 +28,10 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<!-- Versioni non gestite dal BOM di Spring Boot: vanno indicate a mano.
+		     springdoc 3.x e' la linea per Spring Boot 4 (la 2.x e' per Boot 3). -->
+		<springdoc.version>3.1.0</springdoc.version>
+		<jjwt.version>0.12.6</jjwt.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -73,6 +77,36 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<!-- Documentazione automatica delle API REST: springdoc legge a runtime i
+		     @RestController e genera la specifica OpenAPI, Swagger UI la mostra.
+		     Interfaccia su /swagger-ui.html, specifica JSON su /v3/api-docs. -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${springdoc.version}</version>
+		</dependency>
+
+		<!-- JWT per l'autenticazione della parte REST consumata da React.
+		     Solo jjwt-api serve in compilazione: impl e jackson sono
+		     implementazioni caricate a runtime. -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>${jjwt.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>${jjwt.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>${jjwt.version}</version>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 
