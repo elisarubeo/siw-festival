@@ -19,6 +19,36 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     boolean existsByFestivals_Id(Long festivalId);
 
+    /* ------------------------------------------------------------------
+       Ricerca dei film per titolo, genere o regista (bonus §13 della traccia).
+
+       Il pattern arriva dal service gia' in minuscolo e circondato da %:
+       prepararlo una volta sola li' evita di ripetere lower(...) e concat(...)
+       su ogni ramo della OR, e lascia qui una query piu' leggibile.
+
+       Il cognome del regista non ha un ramo suo: si confronta "nome cognome"
+       concatenato, cosi' la stessa condizione copre "sorrentino", "paolo" e
+       "paolo sorrentino" senza doverli distinguere.
+
+       m.genre puo' essere null e in quel caso il confronto non e' vero ne'
+       falso ma sconosciuto: la riga semplicemente non corrisponde a quel ramo,
+       che e' il comportamento voluto.
+
+       join fetch m.director: l'elenco stampa il regista di ogni film, e senza
+       il fetch partirebbe una query per film — le stesse N+1 misurate da
+       FetchStrategyBenchmarkTest. L'alias d serve anche alla clausola where. */
+    @Query("select m from Movie m join fetch m.director d "
+         + "where lower(m.title) like :pattern "
+         + "or lower(m.genre) like :pattern "
+         + "or lower(concat(d.name, ' ', d.surname)) like :pattern "
+         + "order by m.title")
+    List<Movie> search(@Param("pattern") String pattern);
+
+    /* L'elenco completo, con il regista gia' caricato: e' la stessa pagina
+       quando il campo di ricerca e' vuoto, e deve costare le stesse query. */
+    @Query("select m from Movie m join fetch m.director order by m.title")
+    List<Movie> findAllFetchDirector();
+
     /* I film che NON partecipano ancora a un certo festival: sono quelli da
        proporre nella select. "not member of" e' l'operatore JPQL per
        l'appartenenza a una collezione; con i soli nomi dei metodi derivati

@@ -33,9 +33,21 @@ public class MovieController {
         this.imageStorageService = imageStorageService;
     }
 
+    /**
+     * Elenco dei film, eventualmente filtrato dalla barra di ricerca.
+     *
+     * Il parametro e' facoltativo: senza, la pagina e' l'elenco completo di
+     * sempre. La ricerca non ha una rotta propria perche' e' la stessa pagina
+     * con un filtro applicato — e passando da una GET il risultato finisce
+     * nell'URL, quindi e' condivisibile, ricaricabile e navigabile con il
+     * tasto "indietro".
+     */
     @GetMapping("/movies")
-    public String list(Model model) {
-        model.addAttribute("movies", this.movieService.findAll());
+    public String list(@RequestParam(name = "q", required = false) String q, Model model) {
+        model.addAttribute("movies", this.movieService.search(q));
+        /* Rimandato alla vista per due cose: riempire di nuovo il campo dopo
+           la ricerca, e distinguere "non ci sono film" da "nessun risultato". */
+        model.addAttribute("q", q);
         return "movies/list";
     }
 

@@ -19,8 +19,47 @@
 
         <div th:replace="~{fragments/layout :: flash}"></div>
 
+        <!-- Ricerca per titolo, genere o regista. E' una GET perche' non
+             modifica nulla: il risultato finisce nell'URL ed e' quindi
+             condivisibile e ricaricabile. Per questo non serve il token CSRF. -->
+        <form method="get" th:action="@{/movies}" class="row g-2 align-items-end mb-4">
+            <div class="col-12 col-sm-7 col-md-5">
+                <label for="q" class="form-label small text-body-secondary">
+                    Cerca per titolo, genere o regista
+                </label>
+                <!-- type="search": il browser offre il campo con la crocetta
+                     per svuotarlo e la cronologia delle ricerche precedenti. -->
+                <input type="search" id="q" name="q" class="form-control"
+                       placeholder="Es. Sorrentino, Drammatico, La grande bellezza"
+                       th:value="${q}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-dark">Cerca</button>
+            </div>
+            <!-- Compare solo a ricerca attiva: riporta all'elenco completo -->
+            <div class="col-auto" th:if="${q != null and !q.isBlank()}">
+                <a th:href="@{/movies}" class="btn btn-outline-secondary">Azzera</a>
+            </div>
+        </form>
+
+        <p class="text-body-secondary small mb-4"
+           th:if="${q != null and !q.isBlank() and !#lists.isEmpty(movies)}">
+            <span th:text="${#lists.size(movies)}">3</span>
+            <span th:text="${#lists.size(movies) == 1} ? 'film trovato' : 'film trovati'">film trovati</span>
+            per <strong th:text="${q}">ricerca</strong>.
+        </p>
+
         <div th:if="${#lists.isEmpty(movies)}" class="alert alert-secondary">
-            Non ci sono film registrati nel sistema.
+            <!-- Due messaggi diversi: un archivio vuoto e una ricerca senza
+                 risultati sono due situazioni che l'utente risolve in modi
+                 opposti (aggiungere film / cambiare i termini). -->
+            <span th:if="${q == null or q.isBlank()}">
+                Non ci sono film registrati nel sistema.
+            </span>
+            <span th:unless="${q == null or q.isBlank()}">
+                Nessun film corrisponde a <strong th:text="${q}">ricerca</strong>.
+                Prova con un titolo, un genere o il nome di un regista.
+            </span>
         </div>
 
         <div th:unless="${#lists.isEmpty(movies)}"

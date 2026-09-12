@@ -41,6 +41,27 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
+    /**
+     * Ricerca dei film per titolo, genere o regista.
+     *
+     * Con un testo vuoto restituisce tutti i film invece di nessuno: l'elenco
+     * e i risultati della ricerca sono la stessa pagina, e cosi' il controller
+     * ha un caso solo da gestire. E' anche il motivo per cui entrambi i rami
+     * passano da una query con join fetch: la pagina costa lo stesso numero di
+     * query con o senza ricerca.
+     *
+     * Il pattern per la LIKE si costruisce qui e non nella query: e' l'unico
+     * punto in cui il testo scritto dall'utente viene adattato, e resta un
+     * parametro — concatenarlo nel JPQL aprirebbe a una SQL injection.
+     */
+    @Transactional(readOnly = true)
+    public List<Movie> search(String testo) {
+        if (testo == null || testo.isBlank()) {
+            return movieRepository.findAllFetchDirector();
+        }
+        return movieRepository.search("%" + testo.trim().toLowerCase() + "%");
+    }
+
     @Transactional(readOnly = true)
     public long count() {
         return movieRepository.count();
