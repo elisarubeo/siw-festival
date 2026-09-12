@@ -3,6 +3,62 @@
 
 .hero {
     background-color: #1a1a2e;
+    /* leggera sfumatura: la fascia scura risulta meno piatta */
+    background-image: linear-gradient(135deg, #1a1a2e 0%, #2f2f5c 100%);
+}
+
+/* I numeri riassuntivi nella fascia della homepage */
+.hero-stats .stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.hero-stats .stat-label {
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: rgba(255, 255, 255, .7);
+}
+
+/* -------------------------------------------------------------------
+   Data in evidenza
+   Riquadro sullo stile del foglietto di un calendario: giorno grande
+   e mese abbreviato sotto. Il nome del mese arriva gia' in italiano
+   perche' la lingua e' fissata in application.properties.
+   ------------------------------------------------------------------- */
+.date-badge {
+    width: 3.25rem;
+    padding: .35rem 0;
+    border-radius: .5rem;
+    background-color: #1a1a2e;
+    color: #fff;
+    text-align: center;
+    line-height: 1.15;
+}
+
+.date-badge-day {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.date-badge-month {
+    display: block;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: rgba(255, 255, 255, .75);
+}
+
+/* Variante piu' piccola, per gli elenchi */
+.date-badge-sm {
+    width: 2.75rem;
+}
+
+.date-badge-sm .date-badge-day {
+    font-size: 1.15rem;
 }
 
 /* -------------------------------------------------------------------

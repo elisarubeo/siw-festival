@@ -43,7 +43,10 @@ public class FestivalController {
 
     @GetMapping("/festivals")
     public String list(Model model) {
-        model.addAttribute("festivals", this.festivalService.findAll());
+        LocalDate today = LocalDate.now();
+        /* In alto i festival in corso e quelli in programma, sotto lo storico. */
+        model.addAttribute("festivals", this.festivalService.findCurrentAndUpcoming(today));
+        model.addAttribute("pastFestivals", this.festivalService.findPast(today));
         return "festivals/list";
     }
 

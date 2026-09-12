@@ -1,5 +1,6 @@
 package it.uniroma3.siw.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +38,18 @@ public class FestivalService {
     @Transactional(readOnly = true)
     public List<Festival> findAll() {
         return festivalRepository.findAll();
+    }
+
+    /* Festival in corso o futuri, dai piu' imminenti. */
+    @Transactional(readOnly = true)
+    public List<Festival> findCurrentAndUpcoming(LocalDate date) {
+        return festivalRepository.findByEndDateGreaterThanEqualOrderByStartDateAsc(date);
+    }
+
+    /* Festival gia' conclusi, dai piu' recenti. */
+    @Transactional(readOnly = true)
+    public List<Festival> findPast(LocalDate date) {
+        return festivalRepository.findByEndDateLessThanOrderByStartDateDesc(date);
     }
 
     @Transactional(readOnly = true)

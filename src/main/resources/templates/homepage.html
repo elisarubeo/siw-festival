@@ -16,42 +16,90 @@
                 Sfoglia i festival, scopri i film in concorso e i loro registi,
                 consulta il programma delle proiezioni e leggi le recensioni.
             </p>
+
+            <!-- Qualche numero per dare subito il polso di cosa c'e' nel sito -->
+            <div class="hero-stats d-flex flex-wrap gap-5 mt-4">
+                <div>
+                    <span class="stat-number" th:text="${#lists.size(festivals)}">3</span>
+                    <span class="stat-label">festival in programma</span>
+                </div>
+                <div>
+                    <span class="stat-number" th:text="${movieCount}">12</span>
+                    <span class="stat-label">film in catalogo</span>
+                </div>
+                <div>
+                    <span class="stat-number" th:text="${screeningCount}">8</span>
+                    <span class="stat-label">proiezioni in arrivo</span>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-4">
+                <a th:href="@{/festivals}" class="btn btn-light">Tutti i festival</a>
+                <a th:href="@{/screenings}" class="btn btn-outline-light">Programma delle proiezioni</a>
+            </div>
         </div>
     </section>
 
     <div class="container my-5">
 
         <div class="d-flex align-items-baseline justify-content-between mb-4">
-            <h2 class="h3 mb-0">Festival</h2>
+            <h2 class="h3 mb-0">In corso e in programma</h2>
             <a th:href="@{/festivals}" class="small">Vedi tutti &rarr;</a>
         </div>
 
         <div th:if="${#lists.isEmpty(festivals)}" class="alert alert-secondary">
-            Non ci sono festival disponibili al momento.
+            Non ci sono festival in programma al momento.
+            <a th:href="@{/festivals}">Guarda le edizioni passate &rarr;</a>
         </div>
 
         <div th:unless="${#lists.isEmpty(festivals)}" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <div class="col" th:each="festival : ${festivals}">
+            <!-- giorniAllInizio serve sia per il badge sia per capire se il
+                 festival e' gia' cominciato; durata e' inclusiva degli estremi -->
+            <div class="col" th:each="festival : ${festivals}"
+                 th:with="giorniAllInizio=${T(java.time.temporal.ChronoUnit).DAYS.between(today, festival.startDate)},
+                          durata=${T(java.time.temporal.ChronoUnit).DAYS.between(festival.startDate, festival.endDate) + 1}">
                 <article class="card h-100">
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
 
-                        <h3 class="card-title h5 mb-1">
-                            <!-- stretched-link rende cliccabile tutta la card -->
-                            <a class="stretched-link"
-                               th:href="@{/festivals/{id}(id=${festival.id})}"
-                               th:text="${festival.name}">Nome del festival</a>
-                        </h3>
+                        <div class="d-flex gap-3 mb-3">
 
-                        <p class="card-subtitle text-body-secondary mb-3">
-                            <span th:text="${festival.city}">Roma</span>
-                            &middot;
-                            <span th:text="${festival.year}">2026</span>
+                            <!-- la data di inizio, in evidenza come su un calendario -->
+                            <div class="date-badge flex-shrink-0">
+                                <span class="date-badge-day"
+                                      th:text="${#temporals.format(festival.startDate, 'd')}">10</span>
+                                <span class="date-badge-month"
+                                      th:text="${#temporals.format(festival.startDate, 'MMM')}">set</span>
+                            </div>
+
+                            <div>
+                                <h3 class="card-title h5 mb-1">
+                                    <!-- stretched-link rende cliccabile tutta la card -->
+                                    <a class="stretched-link"
+                                       th:href="@{/festivals/{id}(id=${festival.id})}"
+                                       th:text="${festival.name}">Nome del festival</a>
+                                </h3>
+                                <p class="card-subtitle small text-body-secondary mb-0">
+                                    <span th:text="${festival.city}">Roma</span>
+                                    &middot;
+                                    <span th:text="${festival.year}">2026</span>
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <p class="mb-3">
+                            <span th:if="${giorniAllInizio <= 0}"
+                                  class="badge text-bg-success">In corso</span>
+                            <span th:if="${giorniAllInizio == 1}"
+                                  class="badge text-bg-dark">Inizia domani</span>
+                            <span th:if="${giorniAllInizio > 1}"
+                                  class="badge text-bg-dark">Tra
+                                <span th:text="${giorniAllInizio}">12</span> giorni</span>
                         </p>
 
                         <p class="card-text small text-body-secondary mb-3">
-                            <span th:text="${festival.startDate}">2026-09-01</span>
-                            &mdash;
-                            <span th:text="${festival.endDate}">2026-09-10</span>
+                            Dal <span th:text="${#temporals.format(festival.startDate, 'd MMMM')}">10 settembre</span>
+                            al <span th:text="${#temporals.format(festival.endDate, 'd MMMM yyyy')}">20 settembre 2026</span>
                         </p>
 
                         <p class="card-text" th:if="${festival.description}"
@@ -59,10 +107,57 @@
                             Breve descrizione del festival.
                         </p>
 
+                        <div class="card-text small text-body-secondary mt-auto pt-3 border-top">
+                            <span th:text="${durata}">11</span> giorni
+                            &middot;
+                            <span th:text="${#lists.size(festival.movies)}">4</span> film
+                        </div>
+
                     </div>
                 </article>
             </div>
         </div>
+
+        <!-- Anteprima del programma: compare solo se c'e' qualcosa in calendario -->
+        <section th:unless="${#lists.isEmpty(nextScreenings)}" class="mt-5">
+
+            <div class="d-flex align-items-baseline justify-content-between mb-4">
+                <h2 class="h3 mb-0">Prossime proiezioni</h2>
+                <a th:href="@{/screenings}" class="small">Vedi il programma &rarr;</a>
+            </div>
+
+            <div class="card">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex align-items-center gap-3 py-3"
+                        th:each="screening : ${nextScreenings}">
+
+                        <div class="date-badge date-badge-sm flex-shrink-0">
+                            <span class="date-badge-day"
+                                  th:text="${#temporals.format(screening.date, 'd')}">12</span>
+                            <span class="date-badge-month"
+                                  th:text="${#temporals.format(screening.date, 'MMM')}">set</span>
+                        </div>
+
+                        <div class="flex-grow-1">
+                            <a class="fw-semibold"
+                               th:href="@{/movies/{id}(id=${screening.movie.id})}"
+                               th:text="${screening.movie.title}">Titolo del film</a>
+                            <div class="small text-body-secondary">
+                                <a th:href="@{/festivals/{id}(id=${screening.festival.id})}"
+                                   th:text="${screening.festival.name}">Festival</a>
+                                &middot;
+                                <span th:text="${screening.theater.name}">Sala Fellini</span>
+                            </div>
+                        </div>
+
+                        <span class="badge text-bg-light border fs-6 flex-shrink-0"
+                              th:text="${#temporals.format(screening.time, 'HH:mm')}">18:00</span>
+
+                    </li>
+                </ul>
+            </div>
+
+        </section>
 
     </div>
 

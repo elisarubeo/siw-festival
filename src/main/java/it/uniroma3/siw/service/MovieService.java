@@ -42,6 +42,11 @@ public class MovieService {
     }
 
     @Transactional(readOnly = true)
+    public long count() {
+        return movieRepository.count();
+    }
+
+    @Transactional(readOnly = true)
     public boolean existsByTitleAndYear(String title, Integer year) {
         return movieRepository.existsByTitleAndYear(title, year);
     }
