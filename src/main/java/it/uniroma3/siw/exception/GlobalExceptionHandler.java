@@ -20,6 +20,20 @@ public class GlobalExceptionHandler {
         return "error/404";
     }
 
+    /**
+     * File che non e' un'immagine utilizzabile.
+     *
+     * Nell'uso normale non si arriva qui: la form controlla il file prima di
+     * salvare e mostra l'errore accanto al campo. Questa e' la rete per le
+     * richieste che quel controllo non lo passano, per esempio inviate a mano.
+     */
+    @ExceptionHandler(InvalidImageException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleInvalidImage(InvalidImageException e, Model model) {
+        model.addAttribute("errorMessage", e.getMessage());
+        return "error/400";
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleUnexpectedException(Exception e, Model model) {

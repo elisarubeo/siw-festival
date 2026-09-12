@@ -28,6 +28,15 @@
 
             <div class="col" th:each="movie : ${movies}">
                 <article class="card h-100">
+
+                    <!-- object-fit: contain e non cover: le locandine hanno
+                         proporzioni diverse fra loro e ritagliarle taglierebbe
+                         via titoli e volti. -->
+                    <img th:if="${movie.posterFilename}" class="card-img-top bg-body-secondary"
+                         th:src="@{/uploads/{file}(file=${movie.posterFilename})}"
+                         th:alt="'Locandina di ' + ${movie.title}"
+                         style="height: 240px; object-fit: contain;">
+
                     <div class="card-body d-flex flex-column">
 
                         <h2 class="card-title h5 mb-1">

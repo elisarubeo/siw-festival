@@ -38,3 +38,8 @@ frontend/dist/
 frontend/.vite/
 # NOTA: src/main/resources/static/reviews/ (il build) NON e' ignorato di
 # proposito: va versionato, cosi' il progetto si esegue senza avere Node.
+
+### Immagini caricate dagli utenti ###
+# I file delle locandine sono dati, non codice: la cartella la crea
+# ImageStorageService al primo avvio.
+uploads/

@@ -23,10 +23,20 @@
                 <h1 class="h3 mb-4"
                     th:text="${movie.id == null} ? 'Nuovo film' : 'Modifica film'">Nuovo film</h1>
 
-                <form method="post" th:object="${movie}"
+                <!-- enctype="multipart/form-data" e' obbligatorio per inviare un
+                     file: senza, il browser manderebbe solo il NOME del file
+                     scelto, e il contenuto non arriverebbe mai al server. -->
+                <form method="post" th:object="${movie}" enctype="multipart/form-data"
                       th:action="${movie.id == null}
                                  ? @{/movies}
                                  : @{/movies/{id}(id=${movie.id})}">
+
+                    <!-- Errori che non appartengono a un singolo campo, come una
+                         locandina in un formato non ammesso. -->
+                    <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                        <p class="mb-0" th:each="errore : ${#fields.globalErrors()}"
+                           th:text="${errore}">errore</p>
+                    </div>
 
                     <div class="mb-3">
                         <label for="title" class="form-label">Titolo</label>
@@ -85,6 +95,35 @@
                                 Paese <span class="text-body-secondary fw-normal">(facoltativo)</span>
                             </label>
                             <input type="text" id="country" class="form-control" th:field="*{country}">
+                        </div>
+                    </div>
+
+                    <!-- La locandina e' facoltativa. Il campo non usa th:field
+                         perche' non corrisponde a un attributo di Movie: nel
+                         database finisce il nome del file, che lo decide il
+                         server dopo aver salvato l'immagine. -->
+                    <div class="mb-4">
+                        <label for="poster" class="form-label">
+                            Locandina <span class="text-body-secondary fw-normal">(facoltativa)</span>
+                        </label>
+
+                        <div class="d-flex align-items-start gap-3">
+                            <img th:if="${movie.posterFilename}" class="rounded border"
+                                 th:src="@{/uploads/{file}(file=${movie.posterFilename})}"
+                                 th:alt="'Locandina di ' + ${movie.title}"
+                                 style="width: 80px; height: auto;">
+
+                            <div class="flex-grow-1">
+                                <input type="file" id="poster" name="poster" class="form-control"
+                                       accept="image/jpeg,image/png,image/webp,image/gif">
+                                <div class="form-text" th:if="${movie.posterFilename}">
+                                    C'&egrave; gi&agrave; una locandina: scegliendo un file la sostituisci,
+                                    lasciando vuoto resta quella attuale.
+                                </div>
+                                <div class="form-text" th:unless="${movie.posterFilename}">
+                                    JPG, PNG, WEBP o GIF, fino a 5&nbsp;MB.
+                                </div>
+                            </div>
                         </div>
                     </div>
 

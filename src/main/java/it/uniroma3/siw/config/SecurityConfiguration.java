@@ -179,6 +179,12 @@ public class SecurityConfiguration {
             // risorse statiche: sempre accessibili
             authorize.requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll();
 
+            /* Le locandine caricate dall'amministratore: sono immagini di
+               pagine pubbliche (elenco e dettaglio dei film), quindi vanno
+               servite a chiunque. Il caricamento resta invece riservato
+               all'amministratore, perche' passa dalle POST su /movies/**. */
+            authorize.requestMatchers(HttpMethod.GET, "/uploads/**").permitAll();
+
             /* Il build di React viene servito da qui: sono file statici come
                gli altri, e le pagine dell'app decidono da sole cosa mostrare
                a chi non ha fatto login. */

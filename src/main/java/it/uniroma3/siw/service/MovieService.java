@@ -5,6 +5,9 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.web.multipart.MultipartFile;
 
 import it.uniroma3.siw.exception.DuplicateResourceException;
 import it.uniroma3.siw.exception.EntityInUseException;
@@ -18,10 +21,14 @@ public class MovieService {
 
     private final MovieRepository movieRepository;
     private final ScreeningRepository screeningRepository;
+    private final ImageStorageService imageStorageService;
 
-    public MovieService(MovieRepository movieRepository, ScreeningRepository screeningRepository) {
+    public MovieService(MovieRepository movieRepository,
+                        ScreeningRepository screeningRepository,
+                        ImageStorageService imageStorageService) {
         this.movieRepository = movieRepository;
         this.screeningRepository = screeningRepository;
+        this.imageStorageService = imageStorageService;
     }
 
     @Transactional(readOnly = true)
@@ -80,6 +87,75 @@ public class MovieService {
                     + ": ci sono proiezioni programmate. Elimina prima le proiezioni.");
         }
 
+        String locandina = movie.getPosterFilename();
         movieRepository.delete(movie);
+
+        /* Il file si cancella solo se l'eliminazione va davvero a buon fine:
+           se la transazione tornasse indietro, il film resterebbe nel database
+           con il riferimento a un'immagine che non esiste piu'. */
+        cancellaDopoLaTransazione(locandina, null);
+    }
+
+    /* ==================================================================
+       LOCANDINA
+       ================================================================== */
+
+    /**
+     * Imposta (o sostituisce) la locandina di un film.
+     *
+     * Il file viene scritto su disco e nel database finisce solo il suo nome.
+     */
+    @Transactional
+    public void updatePoster(Long id, MultipartFile file) {
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessun film con id " + id));
+
+        String precedente = movie.getPosterFilename();
+        String nuovo = imageStorageService.store(file);
+        movie.setPosterFilename(nuovo);
+
+        /* Qui sta il punto delicato di tutta la funzionalita': il file e' gia'
+           sul disco, ma la riga del database viene scritta davvero solo al
+           commit. Il filesystem non partecipa alla transazione, quindi i due
+           mondi vanno riallineati a mano:
+             - se si arriva al commit, e' il file PRECEDENTE a non servire piu';
+             - se si torna indietro, e' quello NUOVO a essere di troppo.
+           Cancellare subito il precedente significherebbe perderlo in caso di
+           rollback, lasciando nel database un nome che non punta piu' a nulla. */
+        cancellaDopoLaTransazione(precedente, nuovo);
+    }
+
+    /** Toglie la locandina a un film: riferimento nel database e file su disco. */
+    @Transactional
+    public void removePoster(Long id) {
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Nessun film con id " + id));
+
+        String precedente = movie.getPosterFilename();
+        movie.setPosterFilename(null);
+
+        cancellaDopoLaTransazione(precedente, null);
+    }
+
+    /**
+     * Rimanda la cancellazione di un file alla conclusione della transazione:
+     * viene eliminato {@code seCommit} se la transazione e' confermata,
+     * {@code seRollback} se viene annullata. Un argomento null significa
+     * "niente da cancellare in quel caso".
+     */
+    private void cancellaDopoLaTransazione(String seCommit, String seRollback) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            /* Nessuna transazione in corso (metodo chiamato fuori da @Transactional):
+               non c'e' un commit da attendere, si cancella subito. */
+            imageStorageService.delete(seCommit);
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                imageStorageService.delete(status == STATUS_COMMITTED ? seCommit : seRollback);
+            }
+        });
     }
 }

@@ -30,7 +30,41 @@
 
     <div class="container my-5">
 
+        <div th:replace="~{fragments/layout :: flash}"></div>
+
         <div class="row g-4">
+
+            <!-- ====================== LOCANDINA ====================== -->
+            <div class="col-lg-3">
+                <div class="card h-100">
+                    <img th:if="${movie.posterFilename}" class="card-img-top"
+                         th:src="@{/uploads/{file}(file=${movie.posterFilename})}"
+                         th:alt="'Locandina di ' + ${movie.title}">
+
+                    <!-- Nessuna locandina: uno spazio con le proporzioni di un
+                         manifesto, cosi' la pagina non cambia forma quando una
+                         locandina viene aggiunta. -->
+                    <div th:unless="${movie.posterFilename}"
+                         class="d-flex align-items-center justify-content-center bg-body-secondary text-body-secondary small"
+                         style="aspect-ratio: 2 / 3;">
+                        Nessuna locandina
+                    </div>
+
+                    <div class="card-body py-2"
+                         th:if="${movie.posterFilename != null and userDetails != null
+                                 and #lists.contains(userDetails.authorities.![authority], 'ADMIN')}">
+                        <!-- POST e non un link: rimuovere la locandina cambia lo
+                             stato del sistema. -->
+                        <form method="post"
+                              th:action="@{/movies/{id}/poster/delete(id=${movie.id})}"
+                              th:data-confirm="'Rimuovere la locandina di ' + ${movie.title} + '?'">
+                            <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                Rimuovi locandina
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
             <!-- ======================= REGISTA ======================= -->
             <div class="col-lg-4">
@@ -58,7 +92,7 @@
             </div>
 
             <!-- ====================== FESTIVAL ======================= -->
-            <div class="col-lg-8">
+            <div class="col-lg-5">
                 <div class="card h-100">
                     <div class="card-body">
                         <h2 class="h5 card-title">Festival</h2>

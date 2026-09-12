@@ -42,6 +42,16 @@ public class Movie {
     @Min(value = 1, message = "La durata deve essere di almeno un minuto")
     private Integer duration;
 
+    /* Nome del file della locandina, non l'immagine: i byte stanno su disco,
+       nella cartella configurata da app.uploads.directory, e il database
+       conserva soltanto il riferimento. null significa nessuna locandina.
+
+       Non e' un campo della form: lo valorizza il service dopo aver salvato
+       il file, cosi' il client non puo' sceglierlo — e' il nome che decide a
+       quale file l'applicazione andra' ad accedere. */
+    @Column(length = 100)
+    private String posterFilename;
+
     /* lato proprietario della ManyToMany: unica tabella di join del modello */
     @ManyToMany
     @JoinTable(name = "movie_festival",
@@ -109,6 +119,14 @@ public class Movie {
 
     public void setDuration(Integer duration) {
         this.duration = duration;
+    }
+
+    public String getPosterFilename() {
+        return posterFilename;
+    }
+
+    public void setPosterFilename(String posterFilename) {
+        this.posterFilename = posterFilename;
     }
 
     public List<Festival> getFestivals() {
