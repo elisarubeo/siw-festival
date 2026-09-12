@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<!-- Conflitto: l'operazione era valida, ma lo stato del sistema è cambiato
+     mentre veniva eseguita. Il caso tipico è la programmazione simultanea di
+     due proiezioni nella stessa sala, che il livello SERIALIZABLE di
+     ScreeningService impedisce annullandone una. -->
+
+<head th:replace="~{fragments/layout :: head('Operazione non completata')}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="flex-grow-1">
+    <div class="container my-5 text-center">
+        <p class="display-1 fw-bold text-body-tertiary mb-0">409</p>
+        <h1 class="h3 mb-3">Operazione non completata</h1>
+        <p class="text-body-secondary" th:text="${errorMessage}">
+            L'operazione è stata annullata per un conflitto. Riprova.
+        </p>
+        <a th:href="@{/festivals}" class="btn btn-dark mt-3">Torna ai festival</a>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

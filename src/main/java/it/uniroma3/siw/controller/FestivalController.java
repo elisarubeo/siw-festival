@@ -22,7 +22,6 @@ import it.uniroma3.siw.service.FestivalService;
 import it.uniroma3.siw.service.ScreeningService;
 import it.uniroma3.siw.service.TheaterService;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 

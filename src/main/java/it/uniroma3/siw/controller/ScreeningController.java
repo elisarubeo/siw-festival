@@ -3,7 +3,6 @@ package it.uniroma3.siw.controller;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import org.springframework.cglib.core.Local;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,12 +1,13 @@
 package it.uniroma3.siw.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.uniroma3.siw.exception.BusinessRuleException;
@@ -49,7 +50,10 @@ public class ScreeningService {
         return screeningRepository.findAll();
     }
 
-    @Transactional
+    /* SERIALIZABLE: e' un "prima controlla, poi scrivi" sulla disponibilita'
+       della sala, e nessun vincolo del database puo' farne le veci.
+       Vedi la nota sui livelli di isolamento in testa alla classe. */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Screening schedule(Long festivalId, Long movieId, Long theaterId,
                               LocalDate date, LocalTime time) {
 
@@ -100,29 +104,48 @@ public class ScreeningService {
     private void checkTheaterIsFree(Theater theater, LocalDate date, LocalTime start,
                                     int durationMinutes, Long screeningIdToIgnore) {
 
-        LocalTime end = start.plusMinutes(durationMinutes);
+        /* Il confronto si fa su LocalDateTime e non su LocalTime: LocalTime si
+           riavvolge a mezzanotte, quindi per un film che inizia alle 23:00 e
+           dura 130 minuti la fine risulterebbe 01:10, cioe' un orario
+           PRECEDENTE all'inizio. Con un intervallo rovesciato il test di
+           sovrapposizione qui sotto non trova piu' nulla e la proiezione
+           verrebbe accettata anche a sala occupata. Attaccando la data
+           l'intervallo resta ordinato e il confronto torna valido. */
+        LocalDateTime inizio = date.atTime(start);
+        LocalDateTime fine = inizio.plusMinutes(durationMinutes);
 
-        /* Le proiezioni annullate non occupano la sala, quindi restano fuori. */
-        List<Screening> sameDay;
+        /* Le proiezioni annullate non occupano la sala, quindi restano fuori.
+
+           Si guardano anche il giorno prima e il giorno dopo: una proiezione
+           iniziata ieri sera puo' finire oggi, e questa puo' finire domani.
+           Con il filtro sulla sola data entrambe sfuggirebbero al controllo. */
+        LocalDate primoGiorno = date.minusDays(1);
+        LocalDate ultimoGiorno = date.plusDays(1);
+
+        List<Screening> candidate;
         // sto creando una nuova proiezione, quindi non devo escludere nessuna proiezione esistente
         if (screeningIdToIgnore == null) {
-            sameDay = screeningRepository.findByTheaterIdAndDateAndStatusNot(
-                    theater.getId(), date, ScreeningStatus.CANCELLED);
+            candidate = screeningRepository.findByTheaterIdAndDateBetweenAndStatusNot(
+                    theater.getId(), primoGiorno, ultimoGiorno, ScreeningStatus.CANCELLED);
         }
         // sto modificando una proiezione esistente, quindi devo escludere la proiezione stessa
         else {
-            sameDay = screeningRepository.findByTheaterIdAndDateAndStatusNotAndIdNot(
-                    theater.getId(), date, ScreeningStatus.CANCELLED, screeningIdToIgnore);
+            candidate = screeningRepository.findByTheaterIdAndDateBetweenAndStatusNotAndIdNot(
+                    theater.getId(), primoGiorno, ultimoGiorno,
+                    ScreeningStatus.CANCELLED, screeningIdToIgnore);
         }
 
-        for (Screening other : sameDay) {
-            LocalTime otherStart = other.getTime();
-            LocalTime otherEnd = otherStart.plusMinutes(other.getMovie().getDuration());
+        for (Screening other : candidate) {
+            LocalDateTime altroInizio = other.getDate().atTime(other.getTime());
+            LocalDateTime altraFine = altroInizio.plusMinutes(other.getMovie().getDuration());
 
             /* Due intervalli si sovrappongono se ciascuno inizia prima che l'altro finisca. */
-            if (start.isBefore(otherEnd) && otherStart.isBefore(end)) {
+            if (inizio.isBefore(altraFine) && altroInizio.isBefore(fine)) {
+                /* Nel messaggio si indica il giorno della proiezione in
+                   conflitto, che ora puo' essere diverso da quello richiesto. */
                 throw new BusinessRuleException("La sala " + theater.getName()
-                        + " è occupata il " + date + " da " + otherStart + " a " + otherEnd
+                        + " è occupata il " + other.getDate()
+                        + " da " + other.getTime() + " a " + altraFine.toLocalTime()
                         + " (" + other.getMovie().getTitle() + ").");
             }
         }
@@ -136,7 +159,9 @@ public class ScreeningService {
         return screening.getFestival().getId();
     }
 
-    @Transactional
+    /* SERIALIZABLE per lo stesso motivo di schedule(): anche spostare una
+       proiezione rilegge la disponibilita' della sala prima di scriverla. */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Long reschedule(Long screeningId, Long movieId, Long theaterId, LocalDate date, LocalTime time) {
         Screening screening = screeningRepository.findById(screeningId)
                 .orElseThrow(() -> new ResourceNotFoundException("Nessuna proiezione con id " + screeningId));

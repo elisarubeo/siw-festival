@@ -1,5 +1,6 @@
 package it.uniroma3.siw.exception;
 
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.ui.Model;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -32,6 +33,29 @@ public class GlobalExceptionHandler {
     public String handleInvalidImage(InvalidImageException e, Model model) {
         model.addAttribute("errorMessage", e.getMessage());
         return "error/400";
+    }
+
+    /**
+     * Transazione annullata dal database per un conflitto di serializzazione.
+     *
+     * Succede quando due amministratori programmano o spostano una proiezione
+     * nella stessa sala nello stesso istante: ScreeningService lavora a
+     * livello SERIALIZABLE proprio per impedire che passino entrambe, e
+     * PostgreSQL ne fa fallire una al commit.
+     *
+     * Non e' un guasto ma il meccanismo che garantisce la consistenza, quindi
+     * non merita un 500: l'operazione non e' stata eseguita e ripeterla e'
+     * sicuro. Al secondo tentativo il controllo vede la proiezione dell'altro
+     * e risponde con il normale messaggio di sala occupata.
+     */
+    @ExceptionHandler(ConcurrencyFailureException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleConcurrencyFailure(ConcurrencyFailureException e, Model model) {
+        model.addAttribute("errorMessage",
+                "Un'altra operazione sulla stessa sala è stata completata nello stesso "
+                + "istante, e questa è stata annullata per non creare sovrapposizioni. "
+                + "Riprova: nulla è stato modificato.");
+        return "error/409";
     }
 
     @ExceptionHandler(Exception.class)
