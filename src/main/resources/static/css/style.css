@@ -62,6 +62,26 @@
 }
 
 /* -------------------------------------------------------------------
+   Locandine
+   Il riquadro ha le proporzioni di un manifesto (2:3) e l'immagine lo
+   riempie per intero: le card dell'elenco risultano tutte della stessa
+   dimensione e intorno alla locandina non resta la fascia grigia dello
+   sfondo. Il ritaglio tocca solo i bordi, e la locandina intera resta
+   comunque visibile nella pagina del film.
+   ------------------------------------------------------------------- */
+.poster {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Stesso ingombro quando la locandina manca: la griglia resta allineata */
+.poster-placeholder {
+    aspect-ratio: 2 / 3;
+}
+
+/* -------------------------------------------------------------------
    Link
    Bootstrap colora i link di blu attraverso queste due variabili:
    riportandole al colore del testo, nessun link e' piu' blu.
