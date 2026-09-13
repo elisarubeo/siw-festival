@@ -40,5 +40,6 @@ frontend/.vite/
 ### Immagini caricate dagli utenti ###
 uploads/
 
-### Note personali (non versionate) ###
+### Documentazione di supporto (non versionata) ###
 NOTE-TECNICHE.md
+docs/
