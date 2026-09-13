@@ -40,13 +40,11 @@ public class FestivalService {
         return festivalRepository.findAll();
     }
 
-    /* Festival in corso o futuri, dai piu' imminenti. */
     @Transactional(readOnly = true)
     public List<Festival> findCurrentAndUpcoming(LocalDate date) {
         return festivalRepository.findByEndDateGreaterThanEqualOrderByStartDateAsc(date);
     }
 
-    /* Festival gia' conclusi, dai piu' recenti. */
     @Transactional(readOnly = true)
     public List<Festival> findPast(LocalDate date) {
         return festivalRepository.findByEndDateLessThanOrderByStartDateDesc(date);
@@ -79,7 +77,6 @@ public class FestivalService {
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new ResourceNotFoundException("Nessun film con id " + movieId));
 
-        // gia' associato: non succede niente
         if (movie.getFestivals().contains(festival)) {
             return;
         }
@@ -97,8 +94,6 @@ public class FestivalService {
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new ResourceNotFoundException("Nessun film con id " + movieId));
 
-        /* Resterebbero proiezioni di un film che non partecipa
-           piu' al festival. */
         if (screeningRepository.existsByFestivalIdAndMovieId(festivalId, movieId)) {
             throw new EntityInUseException("Non è possibile togliere "
                     + movie.getTitle() + " da " + festival.getName()
@@ -133,9 +128,6 @@ public class FestivalService {
                     + ": ha un programma di proiezioni. Elimina prima le proiezioni.");
         }
 
-        /* Festival e' il lato inverso della ManyToMany con Movie: Hibernate non
-           ripulisce da solo le righe di movie_festival, quindi l'eliminazione
-           fallirebbe per violazione di chiave esterna. */
         if (movieRepository.existsByFestivals_Id(id)) {
             throw new EntityInUseException("Non è possibile eliminare "
                     + festival.getName()

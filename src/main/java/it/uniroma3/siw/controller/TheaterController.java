@@ -89,8 +89,6 @@ public class TheaterController {
         return "redirect:/theaters/" + id;
     }
 
-    /* L'eliminazione e' una POST, non una GET: cambia lo stato del sistema e
-       deve passare per il controllo CSRF. */
     @PostMapping("/theaters/{id}/delete")
     public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {

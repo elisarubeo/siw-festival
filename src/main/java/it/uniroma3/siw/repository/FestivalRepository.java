@@ -13,9 +13,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
 
     boolean existsByNameAndYearAndIdNot(String name, Integer year, Long id);
 
-    /* Festival in corso o non ancora iniziati: i piu' imminenti per primi. */
     List<Festival> findByEndDateGreaterThanEqualOrderByStartDateAsc(LocalDate date);
 
-    /* Festival gia' conclusi: i piu' recenti per primi. */
     List<Festival> findByEndDateLessThanOrderByStartDateDesc(LocalDate date);
 }

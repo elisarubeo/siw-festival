@@ -16,8 +16,6 @@
 
                 <form th:action="@{/register}" method="post">
 
-                    <!-- Primo blocco: i campi dell'entita' User.
-                         th:object cambia l'oggetto di riferimento di *{...} -->
                     <div th:object="${user}">
 
                         <div class="mb-3">
@@ -38,7 +36,6 @@
 
                     </div>
 
-                    <!-- Secondo blocco: i campi dell'entita' Credentials -->
                     <div th:object="${credentials}">
 
                         <div class="mb-3">

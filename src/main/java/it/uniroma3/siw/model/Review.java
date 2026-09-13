@@ -13,7 +13,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
-/* un utente puo' inserire al massimo una recensione per uno stesso film */
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(name = "uk_review_user_movie",
         columnNames = {"user_id", "movie_id"}))
@@ -96,16 +95,10 @@ public class Review {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        /* instanceof e non getClass(): con le associazioni LAZY Hibernate
-           consegna dei proxy, la cui classe e' una sottoclasse generata a
-           runtime. getClass() != obj.getClass() farebbe risultare diversi un
-           proxy e l'entita' che rappresenta. */
         if (!(obj instanceof Review other))
             return false;
-        /* getId() e non other.id: su un proxy l'accesso diretto al campo
-           restituisce null, il getter invece lo inizializza. */
         return id != null && id.equals(other.getId());
     }
 
-    
+
 }

@@ -74,8 +74,6 @@ public class DirectorController {
                          @Valid @ModelAttribute("director") Director director,
                          BindingResult bindingResult) {
 
-        /* Nel controllo di duplicato si esclude il regista stesso, altrimenti
-           risalvarlo senza modifiche verrebbe segnalato come duplicato. */
         if (this.directorService.existsByNameAndSurnameExcluding(
                 director.getName(), director.getSurname(), id)) {
             bindingResult.rejectValue("name", "director.duplicate",
@@ -91,8 +89,6 @@ public class DirectorController {
         return "redirect:/directors/" + id;
     }
 
-    /* L'eliminazione e' una POST, non una GET: cambia lo stato del sistema e
-       deve passare per il controllo CSRF. */
     @PostMapping("/directors/{id}/delete")
     public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {

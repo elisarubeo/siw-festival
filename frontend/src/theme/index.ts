@@ -1,10 +1,5 @@
 import { createTheme } from '@mui/material/styles'
 
-/**
- * Tema MUI dell'app. Personalizzare qui palette, font e forme significa
- * cambiarli ovunque in una volta sola, invece di ritoccare i singoli
- * componenti.
- */
 const theme = createTheme({
   palette: {
     mode: 'light',

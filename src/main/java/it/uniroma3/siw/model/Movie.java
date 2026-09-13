@@ -42,31 +42,20 @@ public class Movie {
     @Min(value = 1, message = "La durata deve essere di almeno un minuto")
     private Integer duration;
 
-    /* Nome del file della locandina, non l'immagine: i byte stanno su disco,
-       nella cartella configurata da app.uploads.directory, e il database
-       conserva soltanto il riferimento. null significa nessuna locandina.
-
-       Non e' un campo della form: lo valorizza il service dopo aver salvato
-       il file, cosi' il client non puo' sceglierlo — e' il nome che decide a
-       quale file l'applicazione andra' ad accedere. */
     @Column(length = 100)
     private String posterFilename;
 
-    /* lato proprietario della ManyToMany: unica tabella di join del modello */
     @ManyToMany
     @JoinTable(name = "movie_festival",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "festival_id"))
     private List<Festival> festivals = new ArrayList<>();
 
-    /* @NotNull serve per la validazione della form: optional/nullable sono
-       vincoli JPA, che il database fa rispettare ma che @Valid non guarda. */
     @NotNull(message = "Il regista è obbligatorio")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "director_id", nullable = false)
     private Director director;
 
-    /* niente cascade: cancellare un film non deve cancellare le proiezioni a catena */
     @OneToMany(mappedBy = "movie")
     private List<Screening> screenings = new ArrayList<>();
 
@@ -170,16 +159,10 @@ public class Movie {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        /* instanceof e non getClass(): con le associazioni LAZY Hibernate
-           consegna dei proxy, la cui classe e' una sottoclasse generata a
-           runtime. getClass() != obj.getClass() farebbe risultare diversi un
-           proxy e l'entita' che rappresenta. */
         if (!(obj instanceof Movie other))
             return false;
-        /* getId() e non other.id: su un proxy l'accesso diretto al campo
-           restituisce null, il getter invece lo inizializza. */
         return id != null && id.equals(other.getId());
     }
 
-    
+
 }

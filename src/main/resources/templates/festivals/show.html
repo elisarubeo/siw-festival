@@ -37,10 +37,8 @@
 
         <div th:replace="~{fragments/layout :: flash}"></div>
 
-        <!-- =================== FILM PARTECIPANTI =================== -->
         <h2 class="h4 mt-5 mb-3">Film in concorso</h2>
 
-        <!-- Associazione di un film al festival: solo amministratori -->
         <form th:action="@{/festivals/{id}/movies(id=${festival.id})}" method="post"
               class="row g-2 align-items-end mb-4"
               th:if="${userDetails != null
@@ -90,7 +88,6 @@
                             di <span th:text="${movie.director.name} + ' ' + ${movie.director.surname}">Regista</span>
                         </p>
 
-                        <!-- Rimozione del film dal festival: solo amministratori -->
                         <form method="post" class="mt-auto pt-3 position-relative"
                               th:action="@{/festivals/{fid}/movies/{mid}/delete(fid=${festival.id}, mid=${movie.id})}"
                               th:data-confirm="'Togliere ' + ${movie.title} + ' da questo festival?'"
@@ -105,10 +102,8 @@
             </div>
         </div>
 
-        <!-- ====================== PROGRAMMA ======================== -->
         <h2 class="h4 mt-5 mb-3">Programma delle proiezioni</h2>
 
-        <!-- Programmazione di una proiezione: solo amministratori -->
         <form th:action="@{/festivals/{id}/screenings(id=${festival.id})}" method="post"
               class="row g-2 align-items-end mb-4"
               th:if="${userDetails != null
@@ -119,7 +114,6 @@
                 <select id="scrMovieId" name="movieId" class="form-select" required
                         th:disabled="${#lists.isEmpty(festival.movies)}">
                     <option value="">— scegli —</option>
-                    <!-- solo i film che partecipano a questo festival -->
                     <option th:each="m : ${festival.movies}"
                             th:value="${m.id}"
                             th:text="${m.title} + ' (' + ${m.duration} + ' min)'">Titolo</option>
@@ -194,8 +188,6 @@
                             <a class="btn btn-sm btn-outline-dark"
                                th:href="@{/screenings/{id}/edit(id=${screening.id})}">Modifica</a>
 
-                            <!-- Annullare non cancella: lascia la proiezione visibile
-                                 nel programma e libera la sala. -->
                             <form th:action="@{/screenings/{id}/cancel(id=${screening.id})}" method="post"
                                   th:if="${screening.status.name() != 'CANCELLED'}"
                                   th:data-confirm="'Annullare questa proiezione?'">

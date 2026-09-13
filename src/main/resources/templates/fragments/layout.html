@@ -1,18 +1,11 @@
 <!DOCTYPE html>
 <html lang="it" xmlns:th="http://www.thymeleaf.org">
 
-<!--
-  Frammenti riutilizzabili da tutte le pagine.
-  Uso: <head th:replace="~{fragments/layout :: head('Titolo pagina')}"></head>
--->
-
 <head th:fragment="head(pageTitle)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="'SIW Festival &middot; ' + ${pageTitle}">SIW Festival</title>
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <!-- il parametro v cambia l'URL a ogni modifica del foglio di stile,
-         cosi' il browser e' costretto a riscaricarlo invece di usare la cache -->
     <link rel="stylesheet" th:href="@{/css/style.css(v=4)}">
 </head>
 
@@ -40,8 +33,6 @@
                     <a class="nav-link" th:href="@{/screenings}">Programma</a>
                 </li>
 
-                <!-- Voce visibile solo agli amministratori. La proiezione .![authority]
-                     trasforma la lista di GrantedAuthority in una lista di stringhe. -->
                 <li class="nav-item dropdown"
                     th:if="${userDetails != null
                             and #lists.contains(userDetails.authorities.![authority], 'ADMIN')}">
@@ -53,8 +44,6 @@
                     </ul>
                 </li>
             </ul>
-            <!-- userDetails arriva da GlobalController, che lo aggiunge al model
-                 di ogni richiesta: e' null quando nessuno ha fatto login. -->
             <ul class="navbar-nav align-items-md-center">
 
                 <li class="nav-item" th:if="${userDetails == null}">
@@ -66,9 +55,6 @@
                 </li>
 
                 <li class="nav-item" th:unless="${userDetails == null}">
-                    <!-- Il logout dev'essere una POST: con CSRF attivo Spring
-                         Security rifiuta il logout via GET. La form fa anche
-                         includere automaticamente il token. -->
                     <form th:action="@{/logout}" method="post" class="d-inline">
                         <button type="submit" class="btn btn-outline-light btn-sm">Esci</button>
                     </form>
@@ -86,8 +72,6 @@
     </div>
 </footer>
 
-<!-- Messaggi di esito che arrivano da un redirect (RedirectAttributes).
-     Uso: <div th:replace="~{fragments/layout :: flash}"></div> -->
 <div th:fragment="flash">
     <div th:if="${successMessage}" class="alert alert-success" role="alert"
          th:text="${successMessage}">esito</div>
@@ -95,25 +79,17 @@
          th:text="${errorMessage}">errore</div>
 </div>
 
-<!-- Pulsanti Modifica ed Elimina, mostrati solo agli amministratori.
-     basePath e' per esempio "/directors", id l'identificativo dell'entita'.
-     L'eliminazione e' una form POST perche' cambia lo stato del sistema. -->
 <div th:fragment="adminActions(basePath, id, confirmText)" class="d-inline-flex gap-2"
      th:if="${userDetails != null
              and #lists.contains(userDetails.authorities.![authority], 'ADMIN')}">
     <a class="btn btn-sm btn-outline-dark position-relative"
        th:href="@{{base}/{id}/edit(base=${basePath}, id=${id})}">Modifica</a>
-    <!-- Il messaggio di conferma sta in un attributo data-, non in onsubmit:
-         Thymeleaf non permette di costruire gestori di eventi da variabili.
-         Se ne occupa lo script in fondo alla pagina. -->
     <form th:action="@{{base}/{id}/delete(base=${basePath}, id=${id})}" method="post"
           class="position-relative" th:data-confirm="${confirmText}">
         <button type="submit" class="btn btn-sm btn-outline-danger">Elimina</button>
     </form>
 </div>
 
-<!-- Badge colorato per lo stato di una proiezione, usato in piu' pagine.
-     Uso: <td th:replace="~{fragments/layout :: statusBadge(${screening.status})}"></td> -->
 <td th:fragment="statusBadge(status)" th:switch="${status.name()}">
     <span th:case="'SCHEDULED'" class="badge text-bg-success">In programma</span>
     <span th:case="'COMPLETED'" class="badge text-bg-secondary">Conclusa</span>
@@ -121,11 +97,9 @@
     <span th:case="*" class="badge text-bg-light" th:text="${status}">stato</span>
 </td>
 
-<!-- Serve per il menu a scomparsa su schermi stretti -->
 <div th:fragment="scripts">
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
     <script>
-        // Chiede conferma prima di inviare le form con attributo data-confirm
         document.querySelectorAll('form[data-confirm]').forEach(function (form) {
             form.addEventListener('submit', function (event) {
                 if (!window.confirm(form.dataset.confirm)) {

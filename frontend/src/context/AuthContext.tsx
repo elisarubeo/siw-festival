@@ -2,15 +2,6 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { login as loginRequest } from '../services/authService'
 import { TOKEN_KEY } from '../services/api'
 
-/**
- * Stato di autenticazione condiviso da tutta l'app.
- *
- * E' il caso d'uso da manuale di useContext (slide 32, lezione 1): l'utente
- * collegato serve in punti lontani dell'albero dei componenti — la navbar, il
- * form delle recensioni, il pulsante Elimina — e passarlo di prop in prop
- * sarebbe ingestibile.
- */
-
 const USERNAME_KEY = 'siw.username'
 const ROLE_KEY = 'siw.role'
 const USERID_KEY = 'siw.userId'
@@ -18,7 +9,6 @@ const USERID_KEY = 'siw.userId'
 interface AuthContextValue {
   token: string | null
   username: string | null
-  /** si confronta con ReviewDto.authorId per riconoscere le proprie recensioni */
   userId: number | null
   role: string | null
   isAuthenticated: boolean
@@ -35,11 +25,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<number | null>(null)
   const [role, setRole] = useState<string | null>(null)
 
-  /**
-   * Token recovery: al primo render rilegge quello che c'e' in localStorage.
-   * Senza questo effetto, ogni ricarica della pagina sloggherebbe l'utente
-   * anche con un token ancora valido.
-   */
   useEffect(() => {
     setToken(localStorage.getItem(TOKEN_KEY))
     setUsername(localStorage.getItem(USERNAME_KEY))
@@ -50,8 +35,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function login(u: string, p: string) {
     const risposta = await loginRequest(u, p)
-    /* localStorage per sopravvivere alla ricarica, lo stato React per far
-       ridisegnare i componenti: servono entrambi, non e' una ripetizione. */
     localStorage.setItem(TOKEN_KEY, risposta.token)
     localStorage.setItem(USERNAME_KEY, risposta.username)
     localStorage.setItem(USERID_KEY, String(risposta.userId))
@@ -87,11 +70,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
-/**
- * Hook di accesso al context. Incapsularlo cosi' evita di importare
- * useContext e AuthContext in ogni componente, ed e' la convenzione che usano
- * anche le slide: const { isAuthenticated } = useAuth()
- */
 export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext)
   if (context === undefined) {

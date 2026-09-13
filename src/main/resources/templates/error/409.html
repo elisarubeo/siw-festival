@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="it" xmlns:th="http://www.thymeleaf.org">
 
-<!-- Conflitto: l'operazione era valida, ma lo stato del sistema è cambiato
-     mentre veniva eseguita. Il caso tipico è la programmazione simultanea di
-     due proiezioni nella stessa sala, che il livello SERIALIZABLE di
-     ScreeningService impedisce annullandone una. -->
-
 <head th:replace="~{fragments/layout :: head('Operazione non completata')}"></head>
 
 <body class="d-flex flex-column min-vh-100">

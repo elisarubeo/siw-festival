@@ -48,9 +48,6 @@ public class DirectorService {
         return directorRepository.save(director);
     }
 
-    /* Carica l'entita' gestita e ne aggiorna i soli campi modificabili.
-       Non si salva l'oggetto arrivato dalla form: le sue collezioni sono
-       vuote e sovrascriverebbero le associazioni esistenti. */
     @Transactional
     public Director update(Long id, Director data) {
         Director director = directorRepository.findById(id)
@@ -67,9 +64,6 @@ public class DirectorService {
         Director director = directorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Nessun regista con id " + id));
 
-        /* Movie.director e' obbligatorio: cancellare un regista con film
-           lascerebbe quei film senza regista, e il database rifiuterebbe
-           l'operazione con un errore di chiave esterna. */
         if (movieRepository.existsByDirectorId(id)) {
             throw new EntityInUseException("Non è possibile eliminare "
                     + director.getName() + " " + director.getSurname()

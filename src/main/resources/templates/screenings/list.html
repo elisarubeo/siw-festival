@@ -22,9 +22,6 @@
 
         <div th:replace="~{fragments/layout :: flash}"></div>
 
-        <!-- Filtro per data. E' una GET perche' non modifica nulla: il
-             risultato finisce nell'URL ed e' quindi condivisibile e
-             ricaricabile. Per questo non serve il token CSRF. -->
         <form method="get" th:action="@{/screenings}" class="row g-2 align-items-end mb-4">
             <div class="col-auto">
                 <label for="date" class="form-label small text-body-secondary">

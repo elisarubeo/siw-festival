@@ -63,8 +63,6 @@ public class TheaterService {
         Theater theater = theaterRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Nessuna sala con id " + id));
 
-        /* Una proiezione si svolge sempre in una sala: eliminarla lascerebbe
-           le proiezioni senza luogo. */
         if (screeningRepository.existsByTheaterId(id)) {
             throw new EntityInUseException("Non è possibile eliminare la sala "
                     + theater.getName()

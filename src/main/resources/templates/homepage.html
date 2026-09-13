@@ -17,7 +17,6 @@
                 consulta il programma delle proiezioni e leggi le recensioni.
             </p>
 
-            <!-- Qualche numero per dare subito il polso di cosa c'e' nel sito -->
             <div class="hero-stats d-flex flex-wrap gap-5 mt-4">
                 <div>
                     <span class="stat-number" th:text="${#lists.size(festivals)}">3</span>
@@ -53,8 +52,6 @@
         </div>
 
         <div th:unless="${#lists.isEmpty(festivals)}" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <!-- giorniAllInizio serve sia per il badge sia per capire se il
-                 festival e' gia' cominciato; durata e' inclusiva degli estremi -->
             <div class="col" th:each="festival : ${festivals}"
                  th:with="giorniAllInizio=${T(java.time.temporal.ChronoUnit).DAYS.between(today, festival.startDate)},
                           durata=${T(java.time.temporal.ChronoUnit).DAYS.between(festival.startDate, festival.endDate) + 1}">
@@ -63,7 +60,6 @@
 
                         <div class="d-flex gap-3 mb-3">
 
-                            <!-- la data di inizio, in evidenza come su un calendario -->
                             <div class="date-badge flex-shrink-0">
                                 <span class="date-badge-day"
                                       th:text="${#temporals.format(festival.startDate, 'd')}">10</span>
@@ -73,7 +69,6 @@
 
                             <div>
                                 <h3 class="card-title h5 mb-1">
-                                    <!-- stretched-link rende cliccabile tutta la card -->
                                     <a class="stretched-link"
                                        th:href="@{/festivals/{id}(id=${festival.id})}"
                                        th:text="${festival.name}">Nome del festival</a>
@@ -118,7 +113,6 @@
             </div>
         </div>
 
-        <!-- Anteprima del programma: compare solo se c'e' qualcosa in calendario -->
         <section th:unless="${#lists.isEmpty(nextScreenings)}" class="mt-5">
 
             <div class="d-flex align-items-baseline justify-content-between mb-4">

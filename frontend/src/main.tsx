@@ -14,21 +14,13 @@ import NotFoundPage from './pages/NotFoundPage'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
-      {/* azzera gli stili di default del browser e applica lo sfondo del tema */}
       <CssBaseline />
 
-      {/* AuthProvider avvolge il Router: cosi' QUALSIASI componente, comprese
-          le pagine e il Layout, puo' chiamare useAuth(). Se stesse dentro una
-          rotta, i componenti fuori da quella rotta non vedrebbero il context. */}
       <AuthProvider>
-        {/* basename: l'app e' servita sotto /reviews, non alla radice del sito.
-            Deve combaciare con "base" in vite.config.ts. */}
         <BrowserRouter basename="/reviews">
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
-              {/* la lettura delle recensioni e' pubblica (traccia §4.1):
-                  questa rotta NON va dentro <PrivateRoute /> */}
               <Route path="movies/:movieId" element={<MovieReviewsPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="*" element={<NotFoundPage />} />

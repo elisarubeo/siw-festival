@@ -32,7 +32,6 @@
             </div>
         </div>
 
-        <!-- lo storico: compare solo se c'e' almeno un festival concluso -->
         <section th:unless="${#lists.isEmpty(pastFestivals)}" class="mt-5">
 
             <h2 class="h4 mb-3">Festival passati</h2>
@@ -51,7 +50,6 @@
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <div th:replace="~{fragments/layout :: scripts}"></div>
 
-<!-- definizione del fragment: non viene mostrata, serve solo ai due elenchi qui sopra -->
 <div th:remove="all">
 
     <article th:fragment="festivalCard(festival, past)" class="card h-100">

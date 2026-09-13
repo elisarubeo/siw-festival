@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="it" xmlns:th="http://www.thymeleaf.org">
 
-<!-- Una sola form per creazione e modifica: cambia solo la destinazione della
-     POST, decisa in base alla presenza dell'id. -->
-
 <head th:replace="~{fragments/layout :: head(${director.id == null} ? 'Nuovo regista' : 'Modifica regista')}"></head>
 
 <body class="d-flex flex-column min-vh-100">

@@ -43,7 +43,6 @@ public class FestivalController {
     @GetMapping("/festivals")
     public String list(Model model) {
         LocalDate today = LocalDate.now();
-        /* In alto i festival in corso e quelli in programma, sotto lo storico. */
         model.addAttribute("festivals", this.festivalService.findCurrentAndUpcoming(today));
         model.addAttribute("pastFestivals", this.festivalService.findPast(today));
         return "festivals/list";
@@ -54,11 +53,7 @@ public class FestivalController {
         Festival festival = this.festivalService.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Nessun festival con id " + id));
         model.addAttribute("festival", festival);
-        /* Serve solo all'amministratore, per la tendina "aggiungi film".
-           La calcoliamo sempre per non mettere logica di sicurezza qui:
-           il template la mostra soltanto a chi ha il ruolo ADMIN. */
         model.addAttribute("addableMovies", this.festivalService.findMoviesNotInFestival(id));
-        // servono alla form di programmazione di una proiezione
         model.addAttribute("theaters", this.theaterService.findAll());
         return "festivals/show";
     }

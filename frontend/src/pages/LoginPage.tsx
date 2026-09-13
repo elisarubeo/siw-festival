@@ -3,12 +3,6 @@ import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom'
 import { Alert, Box, Button, CircularProgress, Container, Link, Paper, TextField, Typography } from '@mui/material'
 import { useAuth } from '../context/AuthContext'
 
-/**
- * Login della parte React.
- *
- * I due campi sono "controllati": il valore vive nello stato React, non nel
- * DOM, e ogni carattere digitato passa da onChange (slide 14, lezione 2).
- */
 export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -19,7 +13,6 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  /* Se PrivateRoute ha dirottato l'utente qui, si torna da dove veniva. */
   const destinazione = (location.state as { from?: string } | null)?.from ?? '/'
 
   async function handleSubmit(event: FormEvent) {
@@ -32,7 +25,6 @@ export default function LoginPage() {
     } catch (e) {
       setErrore(e instanceof Error ? e.message : 'Login non riuscito.')
     } finally {
-      /* nel finally: deve tornare cliccabile sia dopo un successo sia dopo un errore */
       setInCorso(false)
     }
   }

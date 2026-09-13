@@ -10,23 +10,11 @@ import type { Review } from '../types'
 interface ReviewFormDialogProps {
   open: boolean
   movieId: number
-  /** se valorizzata il dialog e' in modifica e precompila i campi, altrimenti crea */
   initial: Review | null
   onClose: () => void
   onSaved: (review: Review) => void
 }
 
-/**
- * Form di inserimento e modifica, dentro un Dialog MUI.
- *
- * Stesso schema di MovieCreateDialog visto a lezione: il componente non sa
- * nulla di chi lo usa, riceve open/onClose/onSaved come props, chiama il
- * servizio e segnala l'esito al genitore.
- *
- * Lo stesso componente serve sia a creare sia a modificare: cambia solo quale
- * funzione del servizio viene chiamata, perche' i campi modificabili sono gli
- * stessi (e' anche il motivo per cui il backend usa un unico ReviewRequest).
- */
 export default function ReviewFormDialog({
   open, movieId, initial, onClose, onSaved,
 }: ReviewFormDialogProps) {
@@ -36,9 +24,6 @@ export default function ReviewFormDialog({
   const [errore, setErrore] = useState<string | null>(null)
   const [inCorso, setInCorso] = useState(false)
 
-  /* Il dialog resta montato anche da chiuso, quindi lo stato va risincronizzato
-     ogni volta che si apre: senza, riaprendolo per modificare una recensione
-     diversa si vedrebbero ancora i valori di quella precedente. */
   useEffect(() => {
     if (open) {
       setText(initial?.text ?? '')
@@ -50,9 +35,6 @@ export default function ReviewFormDialog({
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
 
-    /* Validazione al momento del submit, non prima: mostrare errori mentre
-       l'utente sta ancora scrivendo e' fastidioso. Il backend ricontrolla
-       comunque tutto — questa e' solo cortesia, non sicurezza. */
     if (text.trim() === '') {
       setErrore('Scrivi il testo della recensione.')
       return
@@ -73,8 +55,6 @@ export default function ReviewFormDialog({
       onSaved(salvata)
       onClose()
     } catch (e) {
-      /* L'Alert compare DENTRO il dialog e non lo chiude: quello che l'utente
-         ha scritto resta dov'e', pronto per essere corretto. */
       setErrore(e instanceof Error ? e.message : 'Operazione non riuscita.')
     } finally {
       setInCorso(false)
@@ -110,9 +90,6 @@ export default function ReviewFormDialog({
             multiline
             minRows={4}
             fullWidth
-            /* 2000 e' il limite della colonna nel database, ripetuto in
-               ReviewRequest con @Size: qui serve solo a non far scrivere
-               all'utente un testo che verrebbe respinto. */
             slotProps={{ htmlInput: { maxLength: 2000 } }}
             helperText={`${text.length}/2000`}
           />

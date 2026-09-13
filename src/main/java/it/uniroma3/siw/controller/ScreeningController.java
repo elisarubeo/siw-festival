@@ -48,8 +48,6 @@ public class ScreeningController {
         Screening screening = this.screeningService.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Nessuna proiezione con id " + id));
         model.addAttribute("screening", screening);
-        /* Nella tendina solo i film che partecipano a questo festival:
-           gli altri verrebbero comunque rifiutati dal service. */
         model.addAttribute("movies", screening.getFestival().getMovies());
         model.addAttribute("theaters", this.theaterService.findAll());
         return "screenings/form";
@@ -65,14 +63,13 @@ public class ScreeningController {
                          @DateTimeFormat(pattern = "HH:mm") LocalTime time,
                          RedirectAttributes redirectAttributes) {
 
-        
+
         try {
             Long festivalId = this.screeningService.reschedule(id, movieId, theaterId, date, time);
             redirectAttributes.addFlashAttribute("successMessage", "Proiezione aggiornata.");
             return "redirect:/festivals/" + festivalId;
         } catch (BusinessRuleException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            // in caso di conflitto si torna alla form, con i dati ancora a video
             return "redirect:/screenings/" + id + "/edit";
         }
     }

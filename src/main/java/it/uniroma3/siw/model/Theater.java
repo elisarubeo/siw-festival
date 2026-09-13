@@ -32,7 +32,6 @@ public class Theater {
     @Column(nullable = false)
     private Integer capacity;
 
-    /* niente cascade: cancellare una sala non deve cancellare le proiezioni a catena */
     @OneToMany(mappedBy = "theater")
     private List<Screening> screenings = new ArrayList<>();
 
@@ -85,16 +84,10 @@ public class Theater {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        /* instanceof e non getClass(): con le associazioni LAZY Hibernate
-           consegna dei proxy, la cui classe e' una sottoclasse generata a
-           runtime. getClass() != obj.getClass() farebbe risultare diversi un
-           proxy e l'entita' che rappresenta. */
         if (!(obj instanceof Theater other))
             return false;
-        /* getId() e non other.id: su un proxy l'accesso diretto al campo
-           restituisce null, il getter invece lo inizializza. */
         return id != null && id.equals(other.getId());
     }
 
-    
+
 }

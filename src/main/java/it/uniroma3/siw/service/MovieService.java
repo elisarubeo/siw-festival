@@ -41,19 +41,6 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
-    /**
-     * Ricerca dei film per titolo, genere o regista.
-     *
-     * Con un testo vuoto restituisce tutti i film invece di nessuno: l'elenco
-     * e i risultati della ricerca sono la stessa pagina, e cosi' il controller
-     * ha un caso solo da gestire. E' anche il motivo per cui entrambi i rami
-     * passano da una query con join fetch: la pagina costa lo stesso numero di
-     * query con o senza ricerca.
-     *
-     * Il pattern per la LIKE si costruisce qui e non nella query: e' l'unico
-     * punto in cui il testo scritto dall'utente viene adattato, e resta un
-     * parametro — concatenarlo nel JPQL aprirebbe a una SQL injection.
-     */
     @Transactional(readOnly = true)
     public List<Movie> search(String testo) {
         if (testo == null || testo.isBlank()) {
@@ -103,10 +90,6 @@ public class MovieService {
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Nessun film con id " + id));
 
-        /* Le recensioni hanno cascade + orphanRemoval e spariscono con il film;
-           le righe di movie_festival le toglie Hibernate perche' Movie e' il
-           lato proprietario della ManyToMany. Le proiezioni no: quelle
-           bloccano l'eliminazione. */
         if (screeningRepository.existsByMovieId(id)) {
             throw new EntityInUseException("Non è possibile eliminare "
                     + movie.getTitle()
@@ -116,21 +99,9 @@ public class MovieService {
         String locandina = movie.getPosterFilename();
         movieRepository.delete(movie);
 
-        /* Il file si cancella solo se l'eliminazione va davvero a buon fine:
-           se la transazione tornasse indietro, il film resterebbe nel database
-           con il riferimento a un'immagine che non esiste piu'. */
         cancellaDopoLaTransazione(locandina, null);
     }
 
-    /* ==================================================================
-       LOCANDINA
-       ================================================================== */
-
-    /**
-     * Imposta (o sostituisce) la locandina di un film.
-     *
-     * Il file viene scritto su disco e nel database finisce solo il suo nome.
-     */
     @Transactional
     public void updatePoster(Long id, MultipartFile file) {
         Movie movie = movieRepository.findById(id)
@@ -140,18 +111,9 @@ public class MovieService {
         String nuovo = imageStorageService.store(file);
         movie.setPosterFilename(nuovo);
 
-        /* Qui sta il punto delicato di tutta la funzionalita': il file e' gia'
-           sul disco, ma la riga del database viene scritta davvero solo al
-           commit. Il filesystem non partecipa alla transazione, quindi i due
-           mondi vanno riallineati a mano:
-             - se si arriva al commit, e' il file PRECEDENTE a non servire piu';
-             - se si torna indietro, e' quello NUOVO a essere di troppo.
-           Cancellare subito il precedente significherebbe perderlo in caso di
-           rollback, lasciando nel database un nome che non punta piu' a nulla. */
         cancellaDopoLaTransazione(precedente, nuovo);
     }
 
-    /** Toglie la locandina a un film: riferimento nel database e file su disco. */
     @Transactional
     public void removePoster(Long id) {
         Movie movie = movieRepository.findById(id)
@@ -163,16 +125,8 @@ public class MovieService {
         cancellaDopoLaTransazione(precedente, null);
     }
 
-    /**
-     * Rimanda la cancellazione di un file alla conclusione della transazione:
-     * viene eliminato {@code seCommit} se la transazione e' confermata,
-     * {@code seRollback} se viene annullata. Un argomento null significa
-     * "niente da cancellare in quel caso".
-     */
     private void cancellaDopoLaTransazione(String seCommit, String seRollback) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            /* Nessuna transazione in corso (metodo chiamato fuori da @Transactional):
-               non c'e' un commit da attendere, si cancella subito. */
             imageStorageService.delete(seCommit);
             return;
         }

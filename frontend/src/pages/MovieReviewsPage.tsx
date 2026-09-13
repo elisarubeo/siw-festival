@@ -11,14 +11,6 @@ import ReviewFormDialog from '../components/ReviewFormDialog'
 import ReviewStats from '../components/ReviewStats'
 import type { Review, ReviewStats as Stats } from '../types'
 
-/**
- * Le recensioni di un film: elenco, statistiche, e inserimento/modifica/
- * eliminazione della propria.
- *
- * La pagina e' PUBBLICA in lettura, come chiede il §4.1 della traccia: non sta
- * dentro PrivateRoute. E' il form a comparire o meno a seconda che ci sia un
- * utente collegato.
- */
 export default function MovieReviewsPage() {
   const { movieId } = useParams<{ movieId: string }>()
   const { isAuthenticated, userId } = useAuth()
@@ -33,21 +25,14 @@ export default function MovieReviewsPage() {
 
   const id = Number(movieId)
 
-  /* Le statistiche si ricaricano dopo ogni scrittura, perche' media e
-     distribuzione cambiano. La lista invece no: si aggiorna in memoria con
-     l'oggetto che il server ha appena restituito. */
   const ricaricaStats = useCallback(async () => {
     try {
       setStats(await getStats(id))
     } catch {
-      /* Le statistiche sono un di piu': se falliscono si nascondono e basta,
-         senza far sparire le recensioni che l'utente sta leggendo. */
       setStats(null)
     }
   }, [id])
 
-  /* Una sola chiamata al mount, poi tutto vive nello stato. Le dipendenze
-     sono [id]: cambiando film si ricarica, altrimenti no. */
   useEffect(() => {
     let annullato = false
 
@@ -56,9 +41,6 @@ export default function MovieReviewsPage() {
       setErrore(null)
       try {
         const [lista, statistiche] = await Promise.all([getReviews(id), getStats(id)])
-        /* Se nel frattempo il componente e' stato smontato (o l'id e'
-           cambiato), non si tocca piu' lo stato: scriverlo darebbe un
-           aggiornamento su un componente che non esiste piu'. */
         if (annullato) return
         setReviews(lista)
         setStats(statistiche)
@@ -79,16 +61,11 @@ export default function MovieReviewsPage() {
     return () => { annullato = true }
   }, [id])
 
-  /* Confronto fra id, non fra username: ReviewDto espone authorId e il login
-     restituisce userId. Il backend non puo' esporre lo username dell'autore
-     perche' User non ha un riferimento verso Credentials. */
   const miaRecensione = reviews.find((r) => r.authorId === userId) ?? null
 
   function handleSaved(salvata: Review) {
     setReviews((prev) => {
       const esisteGia = prev.some((r) => r.id === salvata.id)
-      /* Mai mutare l'array: si costruisce sempre una nuova referenza,
-         altrimenti React non si accorge del cambiamento. */
       return esisteGia
         ? prev.map((r) => (r.id === salvata.id ? salvata : r))
         : [salvata, ...prev]
@@ -130,7 +107,6 @@ export default function MovieReviewsPage() {
 
       <Typography variant="h1" sx={{ mb: 1 }}>Recensioni</Typography>
       <Typography variant="body2" sx={{ mb: 4 }}>
-        {/* Link normale e non di React Router: esce dall'app verso Thymeleaf */}
         <Link href={`/movies/${id}`}>Torna alla scheda del film</Link>
       </Typography>
 
@@ -138,7 +114,6 @@ export default function MovieReviewsPage() {
 
       {stats && <Box sx={{ mb: 4 }}><ReviewStats stats={stats} /></Box>}
 
-      {/* Tre casi: non autenticato, autenticato senza recensione, ha gia' recensito */}
       {!isAuthenticated && (
         <Alert severity="info" sx={{ mb: 4 }}
                action={<Button component={RouterLink} to="/login" size="small">Accedi</Button>}>
@@ -165,8 +140,6 @@ export default function MovieReviewsPage() {
       ) : (
         <Stack spacing={2}>
           {reviews.map((review) => (
-            /* key obbligatoria: senza, React non sa quali elementi sono
-               cambiati e ridisegna tutto */
             <ReviewCard
               key={review.id}
               review={review}

@@ -8,15 +8,6 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
-/**
- * Descrizione delle API REST per Swagger UI (/swagger-ui.html).
- *
- * springdoc scopre da solo i @RestController: questa classe serve solo ad
- * aggiungere il titolo e — soprattutto — a dichiarare lo schema di sicurezza,
- * che e' cio' che fa comparire il bottone "Authorize" nell'interfaccia.
- * Da li' si incolla il JWT una volta sola e resta agganciato a tutte le
- * chiamate successive, senza bisogno di curl.
- */
 @Configuration
 public class OpenApiConfig {
 

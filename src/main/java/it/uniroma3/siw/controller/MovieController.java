@@ -33,20 +33,9 @@ public class MovieController {
         this.imageStorageService = imageStorageService;
     }
 
-    /**
-     * Elenco dei film, eventualmente filtrato dalla barra di ricerca.
-     *
-     * Il parametro e' facoltativo: senza, la pagina e' l'elenco completo di
-     * sempre. La ricerca non ha una rotta propria perche' e' la stessa pagina
-     * con un filtro applicato — e passando da una GET il risultato finisce
-     * nell'URL, quindi e' condivisibile, ricaricabile e navigabile con il
-     * tasto "indietro".
-     */
     @GetMapping("/movies")
     public String list(@RequestParam(name = "q", required = false) String q, Model model) {
         model.addAttribute("movies", this.movieService.search(q));
-        /* Rimandato alla vista per due cose: riempire di nuovo il campo dopo
-           la ricerca, e distinguere "non ci sono film" da "nessun risultato". */
         model.addAttribute("q", q);
         return "movies/list";
     }
@@ -77,22 +66,15 @@ public class MovieController {
                     "Esiste già un film con questo titolo e anno");
         }
 
-        /* La locandina si controlla PRIMA di salvare il film: scoprire che il
-           file non va bene dopo aver creato il film lascerebbe a metà
-           l'operazione che l'utente ha chiesto. */
         controllaLocandina(poster, bindingResult);
 
         if (bindingResult.hasErrors()) {
-            /* La select dei registi va ricaricata: il model si ricostruisce
-               a ogni richiesta, e senza questa riga la form tornerebbe vuota. */
             model.addAttribute("directors", this.directorService.findAll());
             return "movies/form";
         }
 
         Movie salvato = this.movieService.save(movie);
 
-        /* La locandina si carica dopo: updatePoster lavora su un film che
-           esiste gia', e l'id lo assegna il salvataggio. */
         if (haContenuto(poster)) {
             this.movieService.updatePoster(salvato.getId(), poster);
         }
@@ -131,9 +113,6 @@ public class MovieController {
 
         this.movieService.update(id, movie);
 
-        /* Campo lasciato vuoto: la locandina attuale resta com'e'. E' anche il
-           motivo per cui posterFilename non e' un campo della form — se lo
-           fosse, il binding lo azzererebbe a ogni salvataggio. */
         if (haContenuto(poster)) {
             this.movieService.updatePoster(id, poster);
         }
@@ -141,7 +120,6 @@ public class MovieController {
         return "redirect:/movies/" + id;
     }
 
-    /** Toglie la locandina a un film, lasciando il film al suo posto. */
     @PostMapping("/movies/{id}/poster/delete")
     public String deletePoster(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         this.movieService.removePoster(id);
@@ -160,20 +138,10 @@ public class MovieController {
         return "redirect:/movies";
     }
 
-    /* ==================================================================
-       SUPPORTO PER LA LOCANDINA
-       ================================================================== */
-
-    /** Il campo file e' facoltativo: se non e' stato scelto nulla, e' vuoto. */
     private boolean haContenuto(MultipartFile file) {
         return file != null && !file.isEmpty();
     }
 
-    /**
-     * Aggiunge un errore alla form se il file caricato non e' un'immagine
-     * utilizzabile. La regola su quali formati siano ammessi sta nel service:
-     * qui si decide solo come comunicarla all'utente.
-     */
     private void controllaLocandina(MultipartFile poster, BindingResult bindingResult) {
         if (haContenuto(poster) && !this.imageStorageService.isSupported(poster)) {
             bindingResult.reject("poster.invalid",

@@ -1,13 +1,6 @@
 import { Link as RouterLink } from 'react-router-dom'
 import { Button, Container, Stack, Typography } from '@mui/material'
 
-/**
- * Pagina di ingresso dell'app React.
- *
- * Nell'uso normale non la si vede: si arriva direttamente su
- * /reviews/movies/{id} cliccando dalla pagina di un film in Thymeleaf.
- * Serve durante lo sviluppo, per avere un punto di partenza.
- */
 export default function HomePage() {
   return (
     <Container maxWidth="sm" sx={{ py: 8 }}>

@@ -16,13 +16,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * Legge l'header "Authorization: Bearer <token>" e, se il token e' valido,
- * popola il SecurityContext con l'identita' dell'utente.
- *
- * Estende OncePerRequestFilter per la garanzia che il nome promette: senza,
- * un forward interno (per esempio verso /error) rieseguirebbe il filtro.
- */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -43,22 +36,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = extractToken(request);
 
-        /* Se il token c'e' ed e' valido si autentica; in tutti gli altri casi
-           NON si blocca la richiesta e non si scrive un 401 qui. Il filtro
-           constata soltanto, e la richiesta prosegue "anonima": chi decide se
-           serviva o meno un'autenticazione e' la catena di sicurezza, sulla
-           base delle regole in SecurityConfiguration. E' cosi' che le GET
-           pubbliche sulle recensioni continuano a funzionare senza token. */
         if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             String username = this.jwtService.extractUsername(token);
             String role = this.jwtService.extractRole(token);
 
             if (username != null) {
-                /* Le authorities si ricostruiscono dal claim del token, senza
-                   interrogare il database: e' il punto dell'approccio
-                   stateless. Il ruolo e' quello scritto in Credentials
-                   ("DEFAULT" oppure "ADMIN"), non "ROLE_..." — coerente con
-                   le hasAuthority(...) usate nel resto dell'applicazione. */
                 List<SimpleGrantedAuthority> authorities = role == null
                         ? List.of()
                         : List.of(new SimpleGrantedAuthority(role));

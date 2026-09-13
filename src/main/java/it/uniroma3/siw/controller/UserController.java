@@ -39,7 +39,7 @@ public class UserController {
                            @Valid @ModelAttribute("credentials") Credentials credentials,
                            BindingResult credentialsBindingResult) {
 
-        
+
         if (this.credentialsService.getCredentials(credentials.getUsername()).isPresent()) {
             credentialsBindingResult.rejectValue("username", "credentials.duplicate",
                     "Questo username è già in uso");
@@ -49,7 +49,7 @@ public class UserController {
             return "register";
         }
 
-       
+
         this.credentialsService.registerUser(user, credentials);
         return "redirect:/login";
     }

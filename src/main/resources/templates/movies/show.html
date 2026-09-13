@@ -34,16 +34,12 @@
 
         <div class="row g-4">
 
-            <!-- ====================== LOCANDINA ====================== -->
             <div class="col-lg-3">
                 <div class="card h-100">
                     <img th:if="${movie.posterFilename}" class="card-img-top"
                          th:src="@{/uploads/{file}(file=${movie.posterFilename})}"
                          th:alt="'Locandina di ' + ${movie.title}">
 
-                    <!-- Nessuna locandina: uno spazio con le proporzioni di un
-                         manifesto, cosi' la pagina non cambia forma quando una
-                         locandina viene aggiunta. -->
                     <div th:unless="${movie.posterFilename}"
                          class="d-flex align-items-center justify-content-center bg-body-secondary text-body-secondary small"
                          style="aspect-ratio: 2 / 3;">
@@ -53,8 +49,6 @@
                     <div class="card-body py-2"
                          th:if="${movie.posterFilename != null and userDetails != null
                                  and #lists.contains(userDetails.authorities.![authority], 'ADMIN')}">
-                        <!-- POST e non un link: rimuovere la locandina cambia lo
-                             stato del sistema. -->
                         <form method="post"
                               th:action="@{/movies/{id}/poster/delete(id=${movie.id})}"
                               th:data-confirm="'Rimuovere la locandina di ' + ${movie.title} + '?'">
@@ -66,7 +60,6 @@
                 </div>
             </div>
 
-            <!-- ======================= REGISTA ======================= -->
             <div class="col-lg-4">
                 <div class="card h-100">
                     <div class="card-body">
@@ -91,7 +84,6 @@
                 </div>
             </div>
 
-            <!-- ====================== FESTIVAL ======================= -->
             <div class="col-lg-5">
                 <div class="card h-100">
                     <div class="card-body">
@@ -118,7 +110,6 @@
 
         </div>
 
-        <!-- ====================== PROIEZIONI ======================== -->
         <h2 class="h4 mt-5 mb-3">Proiezioni</h2>
 
         <div th:if="${#lists.isEmpty(movie.screenings)}" class="alert alert-secondary">
@@ -155,9 +146,6 @@
             </table>
         </div>
 
-        <!-- ====================== RECENSIONI ======================== -->
-        <!-- Le recensioni si leggono qui, ma scriverle, modificarle ed
-             eliminarle avviene nella parte React, servita da /reviews. -->
         <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
             <h2 class="h4 mb-0">Recensioni</h2>
             <a class="btn btn-sm btn-primary"

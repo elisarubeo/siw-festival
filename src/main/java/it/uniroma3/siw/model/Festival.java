@@ -47,11 +47,9 @@ public class Festival {
     @Column(nullable = false)
     private java.time.LocalDate endDate;
 
-    /* lato inverso della ManyToMany: il proprietario e' Movie.festivals */
     @ManyToMany(mappedBy = "festivals")
     private List<Movie> movies = new ArrayList<>();
 
-    /* le proiezioni non esistono senza il festival: cascade + orphanRemoval */
     @OrderBy("date ASC, time ASC")
     @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Screening> screenings = new ArrayList<>();
@@ -137,16 +135,10 @@ public class Festival {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        /* instanceof e non getClass(): con le associazioni LAZY Hibernate
-           consegna dei proxy, la cui classe e' una sottoclasse generata a
-           runtime. getClass() != obj.getClass() farebbe risultare diversi un
-           proxy e l'entita' che rappresenta. */
         if (!(obj instanceof Festival other))
             return false;
-        /* getId() e non other.id: su un proxy l'accesso diretto al campo
-           restituisce null, il getter invece lo inizializza. */
         return id != null && id.equals(other.getId());
     }
 
-    
+
 }

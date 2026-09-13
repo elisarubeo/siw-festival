@@ -3,27 +3,13 @@ import type { Review } from '../types'
 
 interface ReviewCardProps {
   review: Review
-  /** true se la recensione e' dell'utente collegato: mostra Modifica ed Elimina */
   isMine: boolean
   onEdit: (review: Review) => void
   onDelete: (review: Review) => void
 }
 
-/**
- * Una singola recensione.
- *
- * Non decide se la recensione sia dell'utente e non chiama l'API: riceve
- * isMine gia' calcolato e segnala al genitore cosa vuole fare l'utente,
- * tramite le due callback. E' lo schema di FilmCard visto a lezione.
- *
- * I bottoni Modifica ed Elimina sono solo cortesia visiva: nasconderli non
- * protegge nulla, perche' chiunque puo' chiamare l'API a mano. Il controllo
- * che conta e' la verifica di proprieta' nel ReviewService, che risponde 403.
- */
 export default function ReviewCard({ review, isMine, onEdit, onDelete }: ReviewCardProps) {
 
-  /* La data arriva come "2025-11-08" (LocalDate serializzato da Jackson).
-     toLocaleDateString la mostra nel formato italiano: 8 novembre 2025. */
   const data = new Date(review.reviewDate).toLocaleDateString('it-IT', {
     day: 'numeric', month: 'long', year: 'numeric',
   })

@@ -23,16 +23,11 @@
                 <h1 class="h3 mb-4"
                     th:text="${movie.id == null} ? 'Nuovo film' : 'Modifica film'">Nuovo film</h1>
 
-                <!-- enctype="multipart/form-data" e' obbligatorio per inviare un
-                     file: senza, il browser manderebbe solo il NOME del file
-                     scelto, e il contenuto non arriverebbe mai al server. -->
                 <form method="post" th:object="${movie}" enctype="multipart/form-data"
                       th:action="${movie.id == null}
                                  ? @{/movies}
                                  : @{/movies/{id}(id=${movie.id})}">
 
-                    <!-- Errori che non appartengono a un singolo campo, come una
-                         locandina in un formato non ammesso. -->
                     <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
                         <p class="mb-0" th:each="errore : ${#fields.globalErrors()}"
                            th:text="${errore}">errore</p>
@@ -66,9 +61,6 @@
                         </div>
                     </div>
 
-                    <!-- Il regista si sceglie tra quelli esistenti. Thymeleaf usa il
-                         convertitore di Spring per trasformare l'id in entita': in
-                         th:value si passa l'id, e il binding fa il resto. -->
                     <div class="mb-3">
                         <label for="director" class="form-label">Regista</label>
                         <select id="director" class="form-select"
@@ -98,10 +90,6 @@
                         </div>
                     </div>
 
-                    <!-- La locandina e' facoltativa. Il campo non usa th:field
-                         perche' non corrisponde a un attributo di Movie: nel
-                         database finisce il nome del file, che lo decide il
-                         server dopo aver salvato l'immagine. -->
                     <div class="mb-4">
                         <label for="poster" class="form-label">
                             Locandina <span class="text-body-secondary fw-normal">(facoltativa)</span>

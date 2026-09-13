@@ -39,11 +39,8 @@ public class CredentialsService {
 
     @Transactional
     public Credentials registerUser(User user, Credentials credentials) {
-        // la password va cifrata: al login Spring confronta gli hash
         credentials.setPassword(passwordEncoder.encode(credentials.getPassword()));
-        // il ruolo lo decide il server, mai la form
         credentials.setRole(Credentials.DEFAULT_ROLE);
-        // la cascata su Credentials.user salva anche lo User
         credentials.setUser(user);
         return credentialsRepository.save(credentials);
     }

@@ -1,13 +1,9 @@
-/* Stili propri dell'applicazione: si sovrappongono a Bootstrap,
-   che viene caricato prima di questo file. */
 
 .hero {
     background-color: #1a1a2e;
-    /* leggera sfumatura: la fascia scura risulta meno piatta */
     background-image: linear-gradient(135deg, #1a1a2e 0%, #2f2f5c 100%);
 }
 
-/* I numeri riassuntivi nella fascia della homepage */
 .hero-stats .stat-number {
     display: block;
     font-size: 2rem;
@@ -22,12 +18,6 @@
     color: rgba(255, 255, 255, .7);
 }
 
-/* -------------------------------------------------------------------
-   Data in evidenza
-   Riquadro sullo stile del foglietto di un calendario: giorno grande
-   e mese abbreviato sotto. Il nome del mese arriva gia' in italiano
-   perche' la lingua e' fissata in application.properties.
-   ------------------------------------------------------------------- */
 .date-badge {
     width: 3.25rem;
     padding: .35rem 0;
@@ -52,7 +42,6 @@
     color: rgba(255, 255, 255, .75);
 }
 
-/* Variante piu' piccola, per gli elenchi */
 .date-badge-sm {
     width: 2.75rem;
 }
@@ -61,14 +50,6 @@
     font-size: 1.15rem;
 }
 
-/* -------------------------------------------------------------------
-   Locandine
-   Il riquadro ha le proporzioni di un manifesto (2:3) e l'immagine lo
-   riempie per intero: le card dell'elenco risultano tutte della stessa
-   dimensione e intorno alla locandina non resta la fascia grigia dello
-   sfondo. Il ritaglio tocca solo i bordi, e la locandina intera resta
-   comunque visibile nella pagina del film.
-   ------------------------------------------------------------------- */
 .poster {
     width: 100%;
     aspect-ratio: 2 / 3;
@@ -76,23 +57,15 @@
     object-position: center;
 }
 
-/* Stesso ingombro quando la locandina manca: la griglia resta allineata */
 .poster-placeholder {
     aspect-ratio: 2 / 3;
 }
 
-/* -------------------------------------------------------------------
-   Link
-   Bootstrap colora i link di blu attraverso queste due variabili:
-   riportandole al colore del testo, nessun link e' piu' blu.
-   ------------------------------------------------------------------- */
 :root {
     --bs-link-color-rgb: var(--bs-body-color-rgb);
     --bs-link-hover-color-rgb: var(--bs-body-color-rgb);
 }
 
-/* Niente sottolineatura, se non al passaggio del mouse.
-   I bottoni sono esclusi per non rovinarne lo stile. */
 a:not(.btn) {
     text-decoration: none;
 }
@@ -102,17 +75,10 @@ a:not(.btn):focus {
     text-decoration: underline;
 }
 
-/* Nel contenuto il link eredita il colore del testo intorno:
-   scuro sul bianco, chiaro sulla fascia scura in cima alle pagine. */
 main a:not(.btn) {
     color: inherit;
 }
 
-/* -------------------------------------------------------------------
-   Card
-   Quelle che contengono un .stretched-link sono cliccabili per intero:
-   l'ancora viene estesa da Bootstrap su tutta l'area della card.
-   ------------------------------------------------------------------- */
 .card {
     transition: transform .15s ease, box-shadow .15s ease;
 }
@@ -122,15 +88,12 @@ main a:not(.btn) {
     box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
 }
 
-/* I bottoni dentro una card cliccabile devono stare sopra lo stretched-link,
-   altrimenti il link invisibile li coprirebbe e non sarebbero premibili. */
 .card .btn,
 .card form {
     position: relative;
     z-index: 2;
 }
 
-/* Passando sulla card si sottolinea il titolo, per far capire che e' un link */
 .card:hover .card-title a.stretched-link {
     text-decoration: underline;
 }

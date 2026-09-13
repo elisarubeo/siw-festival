@@ -16,7 +16,6 @@ import it.uniroma3.siw.service.ScreeningService;
 @Controller
 public class HomeController {
 
-    /* Quante proiezioni mostrare nell'anteprima del programma */
     private static final int NEXT_SCREENINGS = 5;
 
     private FestivalService festivalService;
@@ -35,19 +34,14 @@ public class HomeController {
     public String getHome(Model model) {
         LocalDate today = LocalDate.now();
 
-        /* In vetrina i festival in corso e quelli in arrivo, dai piu' imminenti:
-           un'edizione conclusa non e' una buona prima impressione. */
         model.addAttribute("festivals", this.festivalService.findCurrentAndUpcoming(today));
 
-        /* Le proiezioni annullate resterebbero in calendario ma non sono
-           un'informazione utile in homepage. */
         List<Screening> upcoming = this.screeningService.findFutureScreenings(today).stream()
                 .filter(screening -> screening.getStatus() != ScreeningStatus.CANCELLED)
                 .toList();
         model.addAttribute("nextScreenings",
                 upcoming.stream().limit(NEXT_SCREENINGS).toList());
 
-        // numeri della fascia in cima alla pagina
         model.addAttribute("screeningCount", upcoming.size());
         model.addAttribute("movieCount", this.movieService.count());
 

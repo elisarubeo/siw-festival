@@ -6,4 +6,3 @@ public class DuplicateResourceException extends RuntimeException {
       super("Elemento già presente nel sistema");
     }
   }
-  
