@@ -26,7 +26,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
          + "order by m.title")
     List<Movie> search(@Param("pattern") String pattern);
 
-    @Query("select m from Movie m join fetch m.director order by m.title")
+    @Query("select m from Movie m join fetch m.director order by lower(m.title)")
     List<Movie> findAllFetchDirector();
 
     @Query("select m from Movie m where :festivalId not in "
